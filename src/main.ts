@@ -12,6 +12,7 @@ async function bootstrap() {
     .setTitle('API para Dentistas e Consultórios')
     .setDescription('CRUD de Dentistas e Consultórios')
     .setVersion('1.0')
+    .addBearerAuth() 
     .build();
   
   const document = SwaggerModule.createDocument(app, config);

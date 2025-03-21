@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, IsIn } from 'class-validator';
 
 export class AuthDto {
   @ApiProperty({ example: 'email@dominio.com ou 11999999999' })
@@ -9,4 +9,8 @@ export class AuthDto {
   @ApiProperty({ example: 'senhaSegura123' })
   @IsString()
   senha: string;
+
+  @ApiProperty({ example: 'profissional', enum: ['profissional', 'consultorio'] })
+  @IsIn(['profissional', 'consultorio'])
+  type: string;
 }

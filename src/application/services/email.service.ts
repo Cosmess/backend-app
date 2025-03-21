@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { randomInt } from 'crypto';
 import { ProfissionalRepository } from 'src/domain/repositories/profissional.repository';
-import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {

@@ -1,13 +1,17 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, BadRequestException, UseGuards } from '@nestjs/common';
 import { ProfissionalService } from '../../application/services/profissional.service';
 import { ProfissionalDto } from '../dtos/profissional.dto';
 import { Profissional } from '../../domain/entities/profissional.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('profissionais')
 export class ProfissionalController {
   constructor(private readonly profissionalService: ProfissionalService) { }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth() 
   @Post()
   async create(@Body() profissionalDto: ProfissionalDto) {
     const profissional: Profissional = {
@@ -31,6 +35,8 @@ export class ProfissionalController {
     return result;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth() 
   @Get()
   async findAll() {
     return this.profissionalService.findAll();
