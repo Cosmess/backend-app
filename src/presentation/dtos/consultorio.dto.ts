@@ -58,4 +58,12 @@ export class ConsultorioDto {
   @IsOptional()
   @IsString()
   foto?: string;
+
+  @ApiProperty()
+  @IsString()
+  senha: string;
+
+  @ApiProperty()
+  @IsString()
+  email: string;
 }

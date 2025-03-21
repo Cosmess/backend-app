@@ -23,8 +23,10 @@ export class Profissional {
       public especialidadeId: string,
       public comentariosId: string,
       public planoId: string,
-      public telefoneVerificado: boolean,
+      public emailVerificado: boolean,
+      public senha: string,
       public foto?: string,
+      public codigo?: string
     ) {}
   }
   

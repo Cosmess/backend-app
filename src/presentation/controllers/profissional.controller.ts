@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, BadRequestException } from '@nestjs/common';
 import { ProfissionalService } from '../../application/services/profissional.service';
 import { ProfissionalDto } from '../dtos/profissional.dto';
 import { Profissional } from '../../domain/entities/profissional.entity';
@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Controller('profissionais')
 export class ProfissionalController {
-  constructor(private readonly profissionalService: ProfissionalService) {}
+  constructor(private readonly profissionalService: ProfissionalService) { }
 
   @Post()
   async create(@Body() profissionalDto: ProfissionalDto) {
@@ -16,16 +16,19 @@ export class ProfissionalController {
       facebook: '',
       instagram: '',
       link: '',
-      status: 'ativo',
+      status: '',
       paidStatus: false,
       dateLastPayment: new Date(),
       especialidadeId: '',
       comentariosId: '',
       planoId: '',
-      exibirNumero: profissionalDto.telefoneVerificado, // Adicionando a propriedade faltante
+      exibirNumero: profissionalDto.exibirNumero,
     };
-
-    return this.profissionalService.create(profissional);
+    const result = await this.profissionalService.create(profissional);
+    if (!result.status) {
+      throw new BadRequestException('Usuário já cadastrado');
+    }
+    return result;
   }
 
   @Get()

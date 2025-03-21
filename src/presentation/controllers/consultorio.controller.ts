@@ -16,7 +16,7 @@ export class ConsultorioController {
       facebook: '',
       instagram: '',
       link: '',
-      status: 'ativo',
+      status: '',
       paidStatus: false,
       dateLastPayment: new Date(),
       especialidadeId: '',

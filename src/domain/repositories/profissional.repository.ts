@@ -25,6 +25,27 @@ export class ProfissionalRepository {
     return doc.exists ? (doc.data() as Profissional) : null;
   }
 
+  async findByEmail(email: string): Promise<Profissional | null> {
+    const db = this.firebaseService.getFirestore();
+    const snapshot = await db.collection(this.collection).where('email', '==', email).get();
+    if (snapshot.empty) return null;
+    return snapshot.docs[0].data() as Profissional;
+  }
+
+  async findByCro(email: string): Promise<Profissional | null> {
+    const db = this.firebaseService.getFirestore();
+    const snapshot = await db.collection(this.collection).where('cro', '==', email).get();
+    if (snapshot.empty) return null;
+    return snapshot.docs[0].data() as Profissional;
+  }
+
+  async findByPhone(phone: string): Promise<Profissional | null> {
+    const db = this.firebaseService.getFirestore();
+    const snapshot = await db.collection(this.collection).where('celular', '==', phone).get();
+    if (snapshot.empty) return null;
+    return snapshot.docs[0].data() as Profissional;
+  }
+
   async update(id: string, data: Partial<Profissional>): Promise<void> {
     const db = this.firebaseService.getFirestore();
     await db.collection(this.collection).doc(id).update(data);

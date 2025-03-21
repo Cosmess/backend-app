@@ -52,10 +52,18 @@ export class ProfissionalDto {
 
   @ApiProperty()
   @IsBoolean()
-  telefoneVerificado: boolean;
+  emailVerificado: boolean;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   foto?: string;
+
+  @ApiProperty()
+  @IsString()
+  senha: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  exibirNumero: boolean;
 }

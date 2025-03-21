@@ -23,6 +23,8 @@ export class Consultorio {
       public comentariosId: string,
       public planoId: string,
       public telefoneVerificado: boolean,
+      public senha: string,
+      public email: string,
       public foto?: string,
     ) {}
   }

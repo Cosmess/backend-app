@@ -25,6 +25,20 @@ export class ConsultorioRepository {
     return doc.exists ? (doc.data() as Consultorio) : null;
   }
 
+  async findByEmail(email: string): Promise<Consultorio | null> {
+    const db = this.firebaseService.getFirestore();
+    const snapshot = await db.collection(this.collection).where('email', '==', email).get();
+    if (snapshot.empty) return null;
+    return snapshot.docs[0].data() as Consultorio;
+  }
+
+  async findByPhone(phone: string): Promise<Consultorio | null> {
+    const db = this.firebaseService.getFirestore();
+    const snapshot = await db.collection(this.collection).where('celular', '==', phone).get();
+    if (snapshot.empty) return null;
+    return snapshot.docs[0].data() as Consultorio;
+  }
+
   async update(id: string, data: Partial<Consultorio>): Promise<void> {
     const db = this.firebaseService.getFirestore();
     await db.collection(this.collection).doc(id).update(data);
