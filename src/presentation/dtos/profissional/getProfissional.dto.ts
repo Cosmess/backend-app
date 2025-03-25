@@ -25,5 +25,5 @@ export class GetProfissionallDto {
     @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
-    especialidade: string;
+    especialidade: string[];
 }

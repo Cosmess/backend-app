@@ -10,6 +10,8 @@ import { Geolocalizacao } from 'src/domain/entities/geolocalizacao.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { GeolocalizacaoRepository } from 'src/domain/repositories/geolocalizacao.repository';
 import { GetProfissionallDto } from 'src/presentation/dtos/profissional/getProfissional.dto';
+import { EspecialidadeRepository } from 'src/domain/repositories/especialidade.repository';
+import { Especialidade } from 'src/domain/entities/especialidade.entity';
 
 @Injectable()
 export class ProfissionalService {
@@ -17,7 +19,8 @@ export class ProfissionalService {
         private readonly croApiService: CroApiService,
         private readonly emailService: EmailService,
         private readonly geoService: GeoLocateService,
-        private readonly geolocalizacaoRepository: GeolocalizacaoRepository
+        private readonly geolocalizacaoRepository: GeolocalizacaoRepository,
+        private readonly especialidadeRepository: EspecialidadeRepository
 
     ) { }
 
@@ -67,7 +70,6 @@ export class ProfissionalService {
             profissional.senha = await bcrypt.hash(profissional.senha, salt);
 
             await this.profissionalRepository.create(profissional);
-
 
             setTimeout(() => {
                 this.profissionalRepository.update(profissional.id, { codigo: '' });

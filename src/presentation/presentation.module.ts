@@ -17,6 +17,9 @@ import { GeolocalizacaoRepository } from 'src/domain/repositories/geolocalizacao
 import { AuthService } from 'src/application/services/auth.service';
 import { JwtStrategy } from 'src/infrastructure/jwt/jwt.strategy';
 import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
+import { EspecialidadeRepository } from 'src/domain/repositories/especialidade.repository';
+import { EspecialidadeController } from './controllers/especialidades.controller';
+import { EspecialidadeService } from 'src/application/services/especialidade.service';
 
 @Module({
   imports: [
@@ -34,6 +37,7 @@ import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
     ToolsController,
     AuthController,
     EmailController,
+    EspecialidadeController
   ],
   providers: [
     ProfissionalService,
@@ -46,7 +50,9 @@ import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
     GeolocalizacaoRepository,
     AuthService,
     JwtStrategy,
-    JwtAuthGuard
+    JwtAuthGuard,
+    EspecialidadeRepository,
+    EspecialidadeService
   ],
 })
 export class PresentationModule {}

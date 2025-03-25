@@ -20,7 +20,7 @@ export class Profissional {
       public status: string,
       public paidStatus: boolean,
       public dateLastPayment: Date,
-      public especialidadeId: string,
+      public especialidades: string[],
       public comentariosId: string,
       public planoId: string,
       public emailVerificado: boolean,
