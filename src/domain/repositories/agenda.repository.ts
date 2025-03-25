@@ -57,6 +57,17 @@ export class AgendaRepository {
     
         return snapshot.docs.map(doc => doc.data() as Agenda);
     }
-    
 
+    async findByIds(ids: string[]): Promise<Agenda[]> {
+        const db = this.firebaseService.getFirestore();
+      
+        const listaIds = Array.isArray(ids) ? ids : [ids];
+  
+        const snapshot = await db
+          .collection('agendas')
+          .where('id', 'in', listaIds)
+          .get();
+      
+          return snapshot.docs.map(doc => doc.data() as Agenda);
+      }    
 }

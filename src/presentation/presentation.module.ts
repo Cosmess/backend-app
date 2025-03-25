@@ -23,6 +23,9 @@ import { EspecialidadeService } from 'src/application/services/especialidade.ser
 import { AgendaService } from 'src/application/services/agenda.service';
 import { AgendaRepository } from 'src/domain/repositories/agenda.repository';
 import { AgendaController } from './controllers/agenda.controller';
+import { ConviteController } from './controllers/convite.controller';
+import { ConviteService } from 'src/application/services/convite.service';
+import { ConviteRepository } from 'src/domain/repositories/convite.repository';
 
 @Module({
   imports: [
@@ -41,7 +44,8 @@ import { AgendaController } from './controllers/agenda.controller';
     AuthController,
     EmailController,
     EspecialidadeController,
-    AgendaController
+    AgendaController,
+    ConviteController
   ],
   providers: [
     ProfissionalService,
@@ -58,7 +62,9 @@ import { AgendaController } from './controllers/agenda.controller';
     EspecialidadeRepository,
     EspecialidadeService,
     AgendaService,
-    AgendaRepository
+    AgendaRepository,
+    ConviteService,
+    ConviteRepository
   ],
 })
 export class PresentationModule {}
