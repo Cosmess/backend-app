@@ -15,6 +15,7 @@ export class AgendaService {
       const item: Agenda = {
         id: uuidv4(),
         horario: horario,
+        status: 'ABERTO',
         tomadorId: userId,
         prestadorId: '',
         prestadorCheck: '',
