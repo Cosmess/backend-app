@@ -26,6 +26,7 @@ import { AgendaController } from './controllers/agenda.controller';
 import { ConviteController } from './controllers/convite.controller';
 import { ConviteService } from 'src/application/services/convite.service';
 import { ConviteRepository } from 'src/domain/repositories/convite.repository';
+import { S3Service } from 'src/infrastructure/s3/s3.service';
 
 @Module({
   imports: [
@@ -64,7 +65,8 @@ import { ConviteRepository } from 'src/domain/repositories/convite.repository';
     AgendaService,
     AgendaRepository,
     ConviteService,
-    ConviteRepository
+    ConviteRepository,
+    S3Service
   ],
 })
 export class PresentationModule {}

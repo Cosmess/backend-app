@@ -10,8 +10,9 @@ import { Geolocalizacao } from 'src/domain/entities/geolocalizacao.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { GeolocalizacaoRepository } from 'src/domain/repositories/geolocalizacao.repository';
 import { GetProfissionallDto } from 'src/presentation/dtos/profissional/getProfissional.dto';
-import { AgendaRepository } from 'src/domain/repositories/agenda.repository';
+import { File } from 'multer';
 import { AgendaService } from './agenda.service';
+import { S3Service } from 'src/infrastructure/s3/s3.service';
 
 @Injectable()
 export class ProfissionalService {
@@ -20,10 +21,11 @@ export class ProfissionalService {
         private readonly emailService: EmailService,
         private readonly geoService: GeoLocateService,
         private readonly geolocalizacaoRepository: GeolocalizacaoRepository,
-        private readonly agendaService: AgendaService
+        private readonly agendaService: AgendaService,
+        private readonly s3service: S3Service
     ) { }
 
-    async create(profissional: Profissional): Promise<SucessDto> {
+    async create(profissional: Profissional,file?: File): Promise<SucessDto> {
         try {
             let profissionalExists = await this.profissionalRepository.findByCro(profissional.cro);
             if (profissionalExists) {
@@ -68,6 +70,9 @@ export class ProfissionalService {
             const salt = await bcrypt.genSalt(10);
             profissional.senha = await bcrypt.hash(profissional.senha, salt);
 
+            if (file) {
+                profissional.foto = await this.s3service.uploadFile(file);
+              }
             await this.profissionalRepository.create(profissional);
 
             setTimeout(() => {

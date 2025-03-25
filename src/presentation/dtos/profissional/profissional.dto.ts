@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsOptional, IsDate, IsEmail, isString, IsArray } from 'class-validator';
+import { IsString, IsBoolean, IsOptional, IsDate, IsEmail, IsArray } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class ProfissionalDto {
   @ApiProperty()
@@ -39,10 +40,12 @@ export class ProfissionalDto {
   estado: string;
 
   @ApiProperty()
+  @Type(() => Date)
   @IsDate()
   created: Date;
 
   @ApiProperty()
+  @Type(() => Date)
   @IsDate()
   updated: Date;
 
@@ -54,10 +57,14 @@ export class ProfissionalDto {
   @IsBoolean()
   emailVerificado: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Upload da imagem do profissional (JPEG/PNG até 1MB)',
+  })
   @IsOptional()
-  @IsString()
-  foto?: string;
+  foto?: any;
 
   @ApiProperty()
   @IsString()
@@ -67,8 +74,7 @@ export class ProfissionalDto {
   @IsBoolean()
   exibirNumero: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ type: [String] })
   @IsArray()
   especialidades: string[];
-
 }

@@ -45,9 +45,6 @@ export class AgendaRepository {
       const db = this.firebaseService.getFirestore();
     
       const listaHorarios = Array.isArray(horarios) ? horarios : [horarios];
-
-      // converte datas para Timestamp
-      const datas = listaHorarios.map(h => new Date(h));
     
       const snapshot = await db
         .collection('agendas')
