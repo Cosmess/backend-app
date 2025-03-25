@@ -1,16 +1,16 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ProfissionalService } from './profissional.service';
-import { ConsultorioService } from './consultorio.service';
+import { EstabelecimentoService } from './estabelecimento.service';
 import * as bcrypt from 'bcrypt';
-import { AuthDto } from '../../presentation/dtos/auth.dto';
+import { AuthDto } from '../../presentation/dtos/auth/auth.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly profissionalService: ProfissionalService,
-    private readonly consultorioService: ConsultorioService
+    private readonly estabelecimentoService: EstabelecimentoService
   ) {}
 
   async login(authDto: AuthDto): Promise<{ token: string; user: any }> {
@@ -20,8 +20,8 @@ export class AuthService {
       let user;
       if (type === 'profissional') {
         user = await this.profissionalService.findByEmailOrPhone(emailOrPhone);
-      } else if (type === 'consultorio') {
-        user = await this.consultorioService.findByEmailOrPhone(emailOrPhone);
+      } else if (type === 'estabelecimento') {
+        user = await this.estabelecimentoService.findByEmailOrPhone(emailOrPhone);
       } else {
         throw new UnauthorizedException('Tipo de usuário inválido');
       }

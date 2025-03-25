@@ -40,19 +40,22 @@ export class GeoLocateService {
     pontoA: { lat: number; lng: number },
     pontoB: { lat: number; lng: number },
   ): Promise<number> {
-    const R = 6371; 
+    const R = 6371; // Raio da Terra em km
     const toRad = (grau: number) => grau * (Math.PI / 180);
-
+  
     const dLat = toRad(pontoB.lat - pontoA.lat);
     const dLng = toRad(pontoB.lng - pontoA.lng);
-
+  
     const a =
       Math.sin(dLat / 2) ** 2 +
       Math.cos(toRad(pontoA.lat)) *
         Math.cos(toRad(pontoB.lat)) *
         Math.sin(dLng / 2) ** 2;
-
+  
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+    const distancia = R * c;
+  
+    return Math.round(distancia);
   }
+  
 }

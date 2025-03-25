@@ -55,4 +55,29 @@ export class ProfissionalRepository {
     const db = this.firebaseService.getFirestore();
     await db.collection(this.collection).doc(id).delete();
   }
+
+  async findByFiltros(filtros: { cep?: string; cidade?: string; estado?: string }): Promise<Profissional[]> {
+    const db = this.firebaseService.getFirestore();
+    const query = db.collection('profissionais');
+    
+    let ref = query as FirebaseFirestore.Query;
+  
+    if (filtros.cep) {
+      ref = ref.where('cep', '==', filtros.cep);
+    } else if (filtros.cidade) {
+      ref = ref.where('cidade', '==', filtros.cidade);
+    } else if (filtros.estado) {
+      ref = ref.where('estado', '==', filtros.estado);
+    }
+  
+    const snapshot = await ref.get();
+    const result: Profissional[] = [];
+  
+    snapshot.forEach(doc => {
+      result.push(doc.data() as Profissional);
+    });
+  
+    return result;
+  }
+  
 }

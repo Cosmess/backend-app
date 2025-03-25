@@ -18,14 +18,14 @@ Este projeto é uma API REST desenvolvida com **NestJS** para gerenciamento de p
 │   │── /application
 │   │   │── /services
 │   │   │   │── profissional.service.ts
-│   │   │   │── consultorio.service.ts
+│   │   │   │── estabelecimento.service.ts
 │   │── /domain
 │   │   │── /entities
 │   │   │   │── profissional.entity.ts
-│   │   │   │── consultorio.entity.ts
+│   │   │   │── estabelecimento.entity.ts
 │   │   │── /repositories
 │   │   │   │── profissional.repository.ts
-│   │   │   │── consultorio.repository.ts
+│   │   │   │── estabelecimento.repository.ts
 │   │── /infrastructure
 │   │   │── /firebase
 │   │   │   │── firebase.module.ts
@@ -35,10 +35,10 @@ Este projeto é uma API REST desenvolvida com **NestJS** para gerenciamento de p
 │   │── /presentation
 │   │   │── /dtos
 │   │   │   │── profissional.dto.ts
-│   │   │   │── consultorio.dto.ts
+│   │   │   │── estabelecimento.dto.ts
 │   │   │── /controllers
 │   │   │   │── profissional.controller.ts
-│   │   │   │── consultorio.controller.ts
+│   │   │   │── estabelecimento.controller.ts
 │   │   │   │── tools.controller.ts
 │   │── app.module.ts
 │   │── main.ts
@@ -80,5 +80,5 @@ CRO_API =https://cro-sp.implanta.net.br/servicosonline//publico/ConsultaInscrito
 
 ## 📌 Endpoints Principais
 - **Profissionais** (`/profissionais`)
-- **Consultórios** (`/consultorios`)
+- **Consultórios** (`/estabelecimentos`)
 - **Consulta CRO** (`/tools/cro/:numeroRegistro`)

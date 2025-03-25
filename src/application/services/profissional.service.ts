@@ -9,6 +9,7 @@ import { GeoLocateService } from './geolocate.service';
 import { Geolocalizacao } from 'src/domain/entities/geolocalizacao.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { GeolocalizacaoRepository } from 'src/domain/repositories/geolocalizacao.repository';
+import { GetProfissionallDto } from 'src/presentation/dtos/profissional/getProfissional.dto';
 
 @Injectable()
 export class ProfissionalService {
@@ -22,15 +23,21 @@ export class ProfissionalService {
 
     async create(profissional: Profissional): Promise<SucessDto> {
         try {
-            const profissionalExists = await this.profissionalRepository.findByCro(profissional.cro);
-            if(profissionalExists){
+            let profissionalExists = await this.profissionalRepository.findByCro(profissional.cro);
+            if (profissionalExists) {
                 return new SucessDto(false, 'Usuário já cadastrado');
             }
+
+            profissionalExists = await this.profissionalRepository.findByEmail(profissional.email);
+            if (profissionalExists) {
+                return new SucessDto(false, 'Usuário já cadastrado');
+            }
+
             const codigo = await this.emailService.enviarCodigoVerificacao(profissional.email);
             profissional.codigo = codigo;
-        
+
             const geolocalizacaoExists = await this.geolocalizacaoRepository.findByCep(profissional.cep);
-            if(!geolocalizacaoExists){
+            if (!geolocalizacaoExists) {
                 const coordenadas = await this.geoService.obterLatLngPorCep(profissional.cep);
                 if (!coordenadas) {
                     throw new Error('Falha ao obter coordenadas');
@@ -40,7 +47,7 @@ export class ProfissionalService {
                     id: uuidv4(),
                     lat: coordenadas.lat,
                     lng: coordenadas.lng,
-                    cep: profissional.cep           
+                    cep: profissional.cep
                 }
 
                 await this.geolocalizacaoRepository.create(geolocalizacao);
@@ -87,13 +94,125 @@ export class ProfissionalService {
         return profissional;
     }
 
-    async findAll(): Promise<Profissional[]> {
-        return this.profissionalRepository.findAll();
+    async findAll(filtros: GetProfissionallDto, userId: any): Promise<Partial<Profissional>[]> {
+        const userData = await this.profissionalRepository.findById(userId);
+        if (!userData?.cep) return [];
+
+        if (filtros.cidade && filtros.estado) {
+            const filtrados = await this.profissionalRepository.findByFiltros(filtros);
+            return filtrados.map((profissional) => {
+                const resultado: Partial<Profissional> = {
+                    nome: profissional.nome,
+                    descricao: profissional.descricao,
+                    cidade: profissional.cidade,
+                    estado: profissional.estado,
+                    cro: profissional.cro,
+                    link: profissional.link,
+                    instagram: profissional.instagram,
+                    facebook: profissional.facebook,
+                    foto: profissional.foto,
+                    cep: profissional.cep,
+                    comentariosId: profissional.comentariosId
+                };
+                if (profissional.exibirNumero) {
+                    resultado.celular = profissional.celular;
+                }
+                return resultado;
+            });
+        }
+
+        if (filtros.cep) {
+            const filtrados = await this.profissionalRepository.findByFiltros(filtros);
+            return filtrados.map((profissional) => {
+                const resultado: Partial<Profissional> = {
+                    nome: profissional.nome,
+                    descricao: profissional.descricao,
+                    cidade: profissional.cidade,
+                    estado: profissional.estado,
+                    cro: profissional.cro,
+                    link: profissional.link,
+                    instagram: profissional.instagram,
+                    facebook: profissional.facebook,
+                    foto: profissional.foto,
+                    cep: profissional.cep,
+                    comentariosId: profissional.comentariosId
+                };
+                if (profissional.exibirNumero) {
+                    resultado.celular = profissional.celular;
+                }
+                return resultado;
+            });
+        }
+
+        const origem = await this.geolocalizacaoRepository.findByCep(userData.cep);
+        if (!origem) return [];
+
+        const todosProfissionais = await this.profissionalRepository.findAll();
+        const profissionaisProximos: Partial<Profissional>[] = [];
+
+        for (const profissional of todosProfissionais) {
+            if (profissional.cep) {
+                const destino = await this.geolocalizacaoRepository.findByCep(profissional.cep);
+
+                if (destino) {
+                    const distancia = await this.geoService.calcularDistancia(
+                        { lat: parseFloat(origem.lat), lng: parseFloat(origem.lng) },
+                        { lat: parseFloat(destino.lat), lng: parseFloat(destino.lng) }
+                    );
+
+                    if (distancia <= 5) {
+                        const resultado: Partial<Profissional> = {
+                            nome: profissional.nome,
+                            descricao: profissional.descricao,
+                            cidade: profissional.cidade,
+                            estado: profissional.estado,
+                            cro: profissional.cro,
+                            link: profissional.link,
+                            instagram: profissional.instagram,
+                            facebook: profissional.facebook,
+                            foto: profissional.foto,
+                            cep: profissional.cep,
+                            comentariosId: profissional.comentariosId
+                        };
+
+                        if (profissional.exibirNumero) {
+                            resultado.celular = profissional.celular;
+                        }
+
+                        profissionaisProximos.push(resultado);
+                    }
+                }
+            }
+        }
+
+        return profissionaisProximos;
     }
 
-    async findById(id: string): Promise<Profissional | null> {
-        return this.profissionalRepository.findById(id);
-    }
+
+    async findById(id: string): Promise<Partial<Profissional> | null> {
+        const profissional = await this.profissionalRepository.findById(id);
+        if (!profissional) return null;
+      
+        const resultado: Partial<Profissional> = {
+          nome: profissional.nome,
+          descricao: profissional.descricao,
+          cidade: profissional.cidade,
+          estado: profissional.estado,
+          cro: profissional.cro,
+          link: profissional.link,
+          instagram: profissional.instagram,
+          facebook: profissional.facebook,
+          foto: profissional.foto,
+          cep: profissional.cep,
+          comentariosId: profissional.comentariosId,
+        };
+      
+        if (profissional.exibirNumero) {
+          resultado.celular = profissional.celular;
+        }
+      
+        return resultado;
+      }
 
     async update(id: string, data: Partial<Profissional>): Promise<void> {
         return this.profissionalRepository.update(id, data);

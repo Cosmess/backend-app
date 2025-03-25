@@ -10,7 +10,7 @@ export class AuthDto {
   @IsString()
   senha: string;
 
-  @ApiProperty({ example: 'profissional', enum: ['profissional', 'consultorio'] })
-  @IsIn(['profissional', 'consultorio'])
+  @ApiProperty({ example: 'profissional', enum: ['profissional', 'estabelecimento'] })
+  @IsIn(['profissional', 'estabelecimento'])
   type: string;
 }

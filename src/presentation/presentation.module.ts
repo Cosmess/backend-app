@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ProfissionalController } from './controllers/profissional.controller';
-import { ConsultorioController } from './controllers/consultorio.controller';
+import { EstabelecimentoController } from './controllers/estabelecimento.controller';
 import { ProfissionalService } from '../application/services/profissional.service';
-import { ConsultorioService } from '../application/services/consultorio.service';
+import { EstabelecimentoService } from '../application/services/estabelecimento.service';
 import { ProfissionalRepository } from '../domain/repositories/profissional.repository';
-import { ConsultorioRepository } from '../domain/repositories/consultorio.repository';
+import { EstabelecimentoRepository } from '../domain/repositories/estabelecimento.repository';
 import { FirebaseModule } from '../infrastructure/firebase/firebase.module';
 import { ToolsController } from './controllers/tools.controller';
 import { CroApiService } from 'src/infrastructure/external/cro-api.service';
@@ -30,16 +30,16 @@ import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
   ],
   controllers: [
     ProfissionalController,
-    ConsultorioController,
+    EstabelecimentoController,
     ToolsController,
     AuthController,
     EmailController,
   ],
   providers: [
     ProfissionalService,
-    ConsultorioService,
+    EstabelecimentoService,
     ProfissionalRepository,
-    ConsultorioRepository,
+    EstabelecimentoRepository,
     CroApiService,
     GeoLocateService,
     EmailService,

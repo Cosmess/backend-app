@@ -1,45 +1,45 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
-import { Consultorio } from '../entities/consultorio.entity';
+import { Estabelecimento } from '../entities/estabelecimento.entity';
 
 @Injectable()
-export class ConsultorioRepository {
-  private collection = 'consultorios';
+export class EstabelecimentoRepository {
+  private collection = 'estabelecimentos';
 
   constructor(private readonly firebaseService: FirebaseService) {}
 
-  async create(consultorio: Consultorio): Promise<void> {
+  async create(estabelecimento: Estabelecimento): Promise<void> {
     const db = this.firebaseService.getFirestore();
-    await db.collection(this.collection).doc(consultorio.id).set({ ...consultorio });
+    await db.collection(this.collection).doc(estabelecimento.id).set({ ...estabelecimento });
   }
 
-  async findAll(): Promise<Consultorio[]> {
+  async findAll(): Promise<Estabelecimento[]> {
     const db = this.firebaseService.getFirestore();
     const snapshot = await db.collection(this.collection).get();
-    return snapshot.docs.map(doc => doc.data() as Consultorio);
+    return snapshot.docs.map(doc => doc.data() as Estabelecimento);
   }
 
-  async findById(id: string): Promise<Consultorio | null> {
+  async findById(id: string): Promise<Estabelecimento | null> {
     const db = this.firebaseService.getFirestore();
     const doc = await db.collection(this.collection).doc(id).get();
-    return doc.exists ? (doc.data() as Consultorio) : null;
+    return doc.exists ? (doc.data() as Estabelecimento) : null;
   }
 
-  async findByEmail(email: string): Promise<Consultorio | null> {
+  async findByEmail(email: string): Promise<Estabelecimento | null> {
     const db = this.firebaseService.getFirestore();
     const snapshot = await db.collection(this.collection).where('email', '==', email).get();
     if (snapshot.empty) return null;
-    return snapshot.docs[0].data() as Consultorio;
+    return snapshot.docs[0].data() as Estabelecimento;
   }
 
-  async findByPhone(phone: string): Promise<Consultorio | null> {
+  async findByPhone(phone: string): Promise<Estabelecimento | null> {
     const db = this.firebaseService.getFirestore();
     const snapshot = await db.collection(this.collection).where('celular', '==', phone).get();
     if (snapshot.empty) return null;
-    return snapshot.docs[0].data() as Consultorio;
+    return snapshot.docs[0].data() as Estabelecimento;
   }
 
-  async update(id: string, data: Partial<Consultorio>): Promise<void> {
+  async update(id: string, data: Partial<Estabelecimento>): Promise<void> {
     const db = this.firebaseService.getFirestore();
     await db.collection(this.collection).doc(id).update(data);
   }
