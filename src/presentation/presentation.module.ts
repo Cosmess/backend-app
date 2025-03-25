@@ -20,6 +20,9 @@ import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
 import { EspecialidadeRepository } from 'src/domain/repositories/especialidade.repository';
 import { EspecialidadeController } from './controllers/especialidades.controller';
 import { EspecialidadeService } from 'src/application/services/especialidade.service';
+import { AgendaService } from 'src/application/services/agenda.service';
+import { AgendaRepository } from 'src/domain/repositories/agenda.repository';
+import { AgendaController } from './controllers/agenda.controller';
 
 @Module({
   imports: [
@@ -37,7 +40,8 @@ import { EspecialidadeService } from 'src/application/services/especialidade.ser
     ToolsController,
     AuthController,
     EmailController,
-    EspecialidadeController
+    EspecialidadeController,
+    AgendaController
   ],
   providers: [
     ProfissionalService,
@@ -52,7 +56,9 @@ import { EspecialidadeService } from 'src/application/services/especialidade.ser
     JwtStrategy,
     JwtAuthGuard,
     EspecialidadeRepository,
-    EspecialidadeService
+    EspecialidadeService,
+    AgendaService,
+    AgendaRepository
   ],
 })
 export class PresentationModule {}

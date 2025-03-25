@@ -10,7 +10,6 @@ export class GeoLocateService {
     this.googleApiKey = this.configService.get<string>('GOOGLE_MAPS_API_KEY', '');
   }
 
-
   async obterLatLngPorCep(cep: string): Promise<{ lat: string; lng: string } | null> {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${cep}&key=${this.googleApiKey}`;
 
@@ -34,7 +33,6 @@ export class GeoLocateService {
       return null;
     }
   }
-
 
   async calcularDistancia(
     pontoA: { lat: number; lng: number },

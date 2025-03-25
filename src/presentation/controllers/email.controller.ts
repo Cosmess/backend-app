@@ -6,7 +6,7 @@ import { EmailDto } from '../dtos/email/email.dto';
 @Controller('email')
 export class EmailController {
  constructor(private readonly emailService: EmailService) {}
-  private codigosVerificacao = new Map<string, string>(); // Simulação de armazenamento
+  private codigosVerificacao = new Map<string, string>(); 
 
   @Post('send-verification')
   async enviarCodigo(@Body() body: EmailDto) {

@@ -16,14 +16,10 @@ export class EmailService {
 
     async enviarCodigoVerificacao(email: string): Promise<string> {
         try {
-            console.log(process.env.AWS_REGION);
-            console.log(process.env.AWS_ACCESS_KEY_ID);
-            console.log(process.env.AWS_SECRET_ACCESS_KEY);
-            console.log(process.env.AWS_EMAIL_FROM); 
-            const codigo = randomInt(100000, 999999).toString(); // Gera um código  de 6 dígitos
+            const codigo = randomInt(100000, 999999).toString(); 
 
             const params = {
-                Source: process.env.AWS_EMAIL_FROM, // Ex: "noreply@seusite.com"
+                Source: process.env.AWS_EMAIL_FROM,
                 Destination: { ToAddresses: [email] },
                 Message: {
                     Subject: { Data: 'Código de Verificação' },
@@ -35,7 +31,7 @@ export class EmailService {
 
             await this.ses.send(new SendEmailCommand(params));
 
-            return codigo; // Armazene este código temporariamente no banco de dados 
+            return codigo;
         } catch (error) {
             console.error(error.message);
             return "";

@@ -5,7 +5,6 @@ import { Profissional } from '../../domain/entities/profissional.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { query } from 'express';
 import { GetProfissionallDto } from '../dtos/profissional/getProfissional.dto';
 
 @Controller('profissionais')

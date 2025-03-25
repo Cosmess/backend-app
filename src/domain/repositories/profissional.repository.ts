@@ -6,7 +6,7 @@ import { Profissional } from '../entities/profissional.entity';
 export class ProfissionalRepository {
   private collection = 'profissionais';
 
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(private readonly firebaseService: FirebaseService) { }
 
   async create(profissional: Profissional): Promise<void> {
     const db = this.firebaseService.getFirestore();
@@ -15,9 +15,26 @@ export class ProfissionalRepository {
 
   async findAll(): Promise<Profissional[]> {
     const db = this.firebaseService.getFirestore();
-    const snapshot = await db.collection(this.collection).get();
+    const snapshot = await db
+      .collection(this.collection)
+      .where('status', '==', 'ATIVO')
+      .get();
+
     return snapshot.docs.map(doc => doc.data() as Profissional);
   }
+
+  async findByIds(ids: string[]): Promise<Profissional[]> {
+    const db = this.firebaseService.getFirestore();
+  
+    const snapshot = await db
+      .collection('profissionais')
+      .where('id', 'in', ids)
+      .where('status', '==', 'ATIVO')
+      .get();
+  
+    return snapshot.docs.map(doc => doc.data() as Profissional);
+  }
+  
 
   async findById(id: string): Promise<Profissional | null> {
     const db = this.firebaseService.getFirestore();
@@ -59,7 +76,7 @@ export class ProfissionalRepository {
   async findByFiltros(filtros: { cep?: string; cidade?: string; estado?: string; especialidade?: string[] }): Promise<Profissional[]> {
     const db = this.firebaseService.getFirestore();
     let ref = db.collection('profissionais').where('status', '==', 'ATIVO') as FirebaseFirestore.Query;
-  
+
     if (filtros.cep) {
       ref = ref.where('cep', '==', filtros.cep);
     } else if (filtros.cidade) {
@@ -67,19 +84,19 @@ export class ProfissionalRepository {
     } else if (filtros.estado) {
       ref = ref.where('estado', '==', filtros.estado);
     }
-  
+
     if (filtros.especialidade) {
       ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
     }
-  
+
     const snapshot = await ref.get();
     const result: Profissional[] = [];
-  
+
     snapshot.forEach(doc => {
       result.push(doc.data() as Profissional);
     });
-  
+
     return result;
   }
-  
+
 }

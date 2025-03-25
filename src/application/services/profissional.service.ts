@@ -10,8 +10,8 @@ import { Geolocalizacao } from 'src/domain/entities/geolocalizacao.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { GeolocalizacaoRepository } from 'src/domain/repositories/geolocalizacao.repository';
 import { GetProfissionallDto } from 'src/presentation/dtos/profissional/getProfissional.dto';
-import { EspecialidadeRepository } from 'src/domain/repositories/especialidade.repository';
-import { Especialidade } from 'src/domain/entities/especialidade.entity';
+import { AgendaRepository } from 'src/domain/repositories/agenda.repository';
+import { AgendaService } from './agenda.service';
 
 @Injectable()
 export class ProfissionalService {
@@ -20,8 +20,7 @@ export class ProfissionalService {
         private readonly emailService: EmailService,
         private readonly geoService: GeoLocateService,
         private readonly geolocalizacaoRepository: GeolocalizacaoRepository,
-        private readonly especialidadeRepository: EspecialidadeRepository
-
+        private readonly agendaService: AgendaService
     ) { }
 
     async create(profissional: Profissional): Promise<SucessDto> {
@@ -100,6 +99,34 @@ export class ProfissionalService {
         const userData = await this.profissionalRepository.findById(userId);
         if (!userData?.cep) return [];
 
+        if(filtros.horarios){
+            const agendas = await this.agendaService.findByHorario(filtros.horarios)
+            if (!agendas) return [];
+
+            const agendaIds = agendas.map(agenda => agenda.tomadorId);
+            const profissionais = await this.profissionalRepository.findByIds(agendaIds.filter(id => id !== undefined));
+            return profissionais.map((profissional) => {
+                const resultado: Partial<Profissional> = {
+                    nome: profissional.nome,
+                    descricao: profissional.descricao,
+                    cidade: profissional.cidade,
+                    estado: profissional.estado,
+                    cro: profissional.cro,
+                    link: profissional.link,
+                    instagram: profissional.instagram,
+                    facebook: profissional.facebook,
+                    foto: profissional.foto,
+                    cep: profissional.cep,
+                    comentariosId: profissional.comentariosId,
+                    especialidades: profissional.especialidades
+                };
+                if (profissional.exibirNumero) {
+                    resultado.celular = profissional.celular;
+                }
+                return resultado;
+            });
+        }
+        
         if (filtros.cidade && filtros.estado) {
             const filtrados = await this.profissionalRepository.findByFiltros(filtros);
             return filtrados.map((profissional) => {
@@ -221,29 +248,32 @@ export class ProfissionalService {
     }
 
 
-    async findById(id: string): Promise<Partial<Profissional> | null> {
-        const profissional = await this.profissionalRepository.findById(id);
-        if (!profissional) return null;
+    async findById(id: string): Promise<any | null> {
+        const profissionalData = await this.profissionalRepository.findById(id);
+        if (!profissionalData) return null;
       
-        const resultado: Partial<Profissional> = {
-          nome: profissional.nome,
-          descricao: profissional.descricao,
-          cidade: profissional.cidade,
-          estado: profissional.estado,
-          cro: profissional.cro,
-          link: profissional.link,
-          instagram: profissional.instagram,
-          facebook: profissional.facebook,
-          foto: profissional.foto,
-          cep: profissional.cep,
-          comentariosId: profissional.comentariosId,
+        const agendaDisponivel = await this.agendaService.findByTomador(id);
+
+        const profissional: Partial<Profissional> = {
+          nome: profissionalData.nome,
+          descricao: profissionalData.descricao,
+          cidade: profissionalData.cidade,
+          estado: profissionalData.estado,
+          cro: profissionalData.cro,
+          link: profissionalData.link,
+          instagram: profissionalData.instagram,
+          facebook: profissionalData.facebook,
+          foto: profissionalData.foto,
+          cep: profissionalData.cep,
+          comentariosId: profissionalData.comentariosId,
+          especialidades: profissionalData.especialidades
         };
       
-        if (profissional.exibirNumero) {
-          resultado.celular = profissional.celular;
+        if (profissionalData.exibirNumero) {
+            profissionalData.celular = profissionalData.celular;
         }
       
-        return resultado;
+        return {profissionalData, agendaDisponivel};
       }
 
     async update(id: string, data: Partial<Profissional>): Promise<void> {

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsEmail } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsEmail, IsArray, IsDate } from 'class-validator';
 
 export class GetProfissionallDto {
     @ApiProperty({ required: false })
@@ -26,4 +27,11 @@ export class GetProfissionallDto {
     @IsOptional()
     @IsString()
     especialidade: string[];
+
+    @ApiProperty({ type: [Date], required: false })
+    @IsOptional()
+    @IsArray()
+    @Type(() => Date)
+    @IsDate({ each: true })
+    horarios?: string[];
 }
