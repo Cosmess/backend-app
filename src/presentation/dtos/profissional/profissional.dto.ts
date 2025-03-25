@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsOptional, IsDate, IsEmail } from 'class-validator';
+import { IsString, IsBoolean, IsOptional, IsDate, IsEmail, isString, IsArray } from 'class-validator';
 
 export class ProfissionalDto {
   @ApiProperty()
@@ -66,4 +66,9 @@ export class ProfissionalDto {
   @ApiProperty()
   @IsBoolean()
   exibirNumero: boolean;
+
+  @ApiProperty()
+  @IsArray()
+  especialidades: string[];
+
 }

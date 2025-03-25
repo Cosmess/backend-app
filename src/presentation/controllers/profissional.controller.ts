@@ -23,7 +23,7 @@ export class ProfissionalController {
       status: '',
       paidStatus: false,
       dateLastPayment: new Date(),
-      especialidades: [],
+      especialidades: profissionalDto.especialidades,
       comentariosId: '',
       planoId: '',
       exibirNumero: profissionalDto.exibirNumero,
