@@ -13,7 +13,7 @@ export class AuthService {
     private readonly estabelecimentoService: EstabelecimentoService
   ) {}
 
-  async login(authDto: AuthDto): Promise<{ token: string; user: any }> {
+  async login(authDto: AuthDto): Promise<{ token: string; payload: any }> {
     try {
       const { emailOrPhone, senha, type } = authDto;
 
@@ -35,10 +35,10 @@ export class AuthService {
       const payload = { sub: user.id, email: user.email, type };
       const token = await this.jwtService.signAsync(payload);
   
-      return { token, user };
+      return { token, payload };
     } catch (error) {
       console.error(error.message);
-      return { token: '', user: null };
+      return { token: '', payload: null };
     }
 
   }

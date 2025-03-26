@@ -7,6 +7,7 @@ export class Estabelecimento {
       public croResponsavel: string,
       public endereco: string,
       public numero: string,
+      public celular: string,
       public cep: string,
       public cidade: string,
       public estado: string,
@@ -18,14 +19,16 @@ export class Estabelecimento {
       public link: string,
       public status: string,
       public paidStatus: boolean,
-      public dateLastPayment: Date,
-      public especialidadeId: string,
+      public especialidades: string[],
       public comentariosId: string,
       public planoId: string,
       public telefoneVerificado: boolean,
       public senha: string,
       public email: string,
       public foto?: string,
+      public codigo?: string,
+      public dateLastPayment?: Date,
+      public exibirNumero?: boolean,
     ) {}
   }
   

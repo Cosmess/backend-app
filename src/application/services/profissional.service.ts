@@ -13,6 +13,7 @@ import { GetProfissionallDto } from 'src/presentation/dtos/profissional/getProfi
 import { File } from 'multer';
 import { AgendaService } from './agenda.service';
 import { S3Service } from 'src/infrastructure/s3/s3.service';
+import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
 
 @Injectable()
 export class ProfissionalService {
@@ -22,7 +23,8 @@ export class ProfissionalService {
         private readonly geoService: GeoLocateService,
         private readonly geolocalizacaoRepository: GeolocalizacaoRepository,
         private readonly agendaService: AgendaService,
-        private readonly s3service: S3Service
+        private readonly s3service: S3Service,
+        private readonly estabelecimentoRepository: EstabelecimentoRepository
     ) { }
 
     async create(profissional: Profissional,file?: File): Promise<SucessDto> {
@@ -71,7 +73,7 @@ export class ProfissionalService {
             profissional.senha = await bcrypt.hash(profissional.senha, salt);
 
             if (file) {
-                profissional.foto = await this.s3service.uploadFile(file);
+                profissional.foto = await this.s3service.uploadFile(file,'profissionais');
               }
             await this.profissionalRepository.create(profissional);
 
@@ -101,7 +103,7 @@ export class ProfissionalService {
     }
 
     async findAll(filtros: GetProfissionallDto, userId: any): Promise<Partial<Profissional>[]> {
-        const userData = await this.profissionalRepository.findById(userId);
+        const userData = await this.estabelecimentoRepository.findById(userId);
         if (!userData?.cep) return [];
 
         if(filtros.horarios){

@@ -6,7 +6,7 @@ import { Estabelecimento } from '../entities/estabelecimento.entity';
 export class EstabelecimentoRepository {
   private collection = 'estabelecimentos';
 
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(private readonly firebaseService: FirebaseService) { }
 
   async create(estabelecimento: Estabelecimento): Promise<void> {
     const db = this.firebaseService.getFirestore();
@@ -32,6 +32,13 @@ export class EstabelecimentoRepository {
     return snapshot.docs[0].data() as Estabelecimento;
   }
 
+  async findByCnpj(cnpj: string): Promise<Estabelecimento | null> {
+    const db = this.firebaseService.getFirestore();
+    const snapshot = await db.collection(this.collection).where('cnpj', '==', cnpj).get();
+    if (snapshot.empty) return null;
+    return snapshot.docs[0].data() as Estabelecimento;
+  }
+
   async findByPhone(phone: string): Promise<Estabelecimento | null> {
     const db = this.firebaseService.getFirestore();
     const snapshot = await db.collection(this.collection).where('celular', '==', phone).get();
@@ -48,4 +55,43 @@ export class EstabelecimentoRepository {
     const db = this.firebaseService.getFirestore();
     await db.collection(this.collection).doc(id).delete();
   }
+
+  async findByIds(ids: string[]): Promise<Estabelecimento[]> {
+    const db = this.firebaseService.getFirestore();
+
+    const snapshot = await db
+      .collection('profissionais')
+      .where('id', 'in', ids)
+      .where('status', '==', 'ATIVO')
+      .get();
+
+    return snapshot.docs.map(doc => doc.data() as Estabelecimento);
+  }
+
+    async findByFiltros(filtros: { cep?: string; cidade?: string; estado?: string; especialidade?: string[] }): Promise<Estabelecimento[]> {
+      const db = this.firebaseService.getFirestore();
+      let ref = db.collection('profissionais').where('status', '==', 'ATIVO') as FirebaseFirestore.Query;
+  
+      if (filtros.cep) {
+        ref = ref.where('cep', '==', filtros.cep);
+      } else if (filtros.cidade) {
+        ref = ref.where('cidade', '==', filtros.cidade);
+      } else if (filtros.estado) {
+        ref = ref.where('estado', '==', filtros.estado);
+      }
+  
+      if (filtros.especialidade) {
+        ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
+      }
+  
+      const snapshot = await ref.get();
+      const result: Estabelecimento[] = [];
+  
+      snapshot.forEach(doc => {
+        result.push(doc.data() as Estabelecimento);
+      });
+  
+      return result;
+    }
+
 }

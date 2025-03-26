@@ -8,8 +8,8 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() authDto: AuthDto) {
-    const { token, user } = await this.authService.login(authDto);
+    const { token, payload } = await this.authService.login(authDto);
     if (!token) throw new UnauthorizedException('Credenciais inválidas');
-    return { token, user };
+    return { token, payload };
   }
 }

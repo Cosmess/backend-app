@@ -1,15 +1,22 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseInterceptors, UploadedFile, UseGuards, Req, Query } from '@nestjs/common';
 import { EstabelecimentoService } from '../../application/services/estabelecimento.service';
 import { EstabelecimentoDto } from '../dtos/estabelecimento/estabelecimento.dto';
 import { Estabelecimento } from '../../domain/entities/estabelecimento.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
+import { query } from 'express';
+import { GetEstabelecimentoDto } from '../dtos/estabelecimento/getEstabelecimento.dto';
 
 @Controller('estabelecimentos')
 export class EstabelecimentoController {
-  constructor(private readonly estabelecimentoService: EstabelecimentoService) {}
+  constructor(private readonly estabelecimentoService: EstabelecimentoService) { }
 
   @Post()
-  async create(@Body() estabelecimentoDto: EstabelecimentoDto) {
+  @UseInterceptors(FileInterceptor('foto'))
+  @ApiConsumes('multipart/form-data')
+  async create(@UploadedFile() file: File, @Body() estabelecimentoDto: EstabelecimentoDto) {
     const estabelecimento: Estabelecimento = {
       id: uuidv4(),
       ...estabelecimentoDto,
@@ -19,17 +26,22 @@ export class EstabelecimentoController {
       status: '',
       paidStatus: false,
       dateLastPayment: new Date(),
-      especialidadeId: '',
+      especialidades: estabelecimentoDto.especialidades,
       comentariosId: '',
       planoId: '',
+      exibirNumero: estabelecimentoDto.exibirNumero,
+      telefoneVerificado: false
     };
 
-    return this.estabelecimentoService.create(estabelecimento);
+    return this.estabelecimentoService.create(estabelecimento, file);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get()
-  async findAll() {
-    return this.estabelecimentoService.findAll();
+  async findAll(@Query() dto: GetEstabelecimentoDto, @Req() req: any) {
+    const userId = req.user.userId as any;
+    return this.estabelecimentoService.findAll(dto,userId);
   }
 
   @Get(':id')

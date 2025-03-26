@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsBoolean, IsOptional, IsDate, IsArray } from 'class-validator';
 
 export class EstabelecimentoDto {
   @ApiProperty()
@@ -50,14 +50,14 @@ export class EstabelecimentoDto {
   @IsString()
   descricao: string;
 
-  @ApiProperty()
-  @IsBoolean()
-  telefoneVerificado: boolean;
-
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Upload da imagem do estabelecimento (JPEG/PNG até 1MB)',
+  })
   @IsOptional()
-  @IsString()
-  foto?: string;
+  foto?: any;
 
   @ApiProperty()
   @IsString()
@@ -66,4 +66,20 @@ export class EstabelecimentoDto {
   @ApiProperty()
   @IsString()
   email: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  emailVerificado: boolean;
+
+  @ApiProperty()
+  @IsBoolean()
+  exibirNumero: boolean;
+
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  especialidades: string[];
+
+  @ApiProperty()
+  @IsString()
+  celular: string;
 }
