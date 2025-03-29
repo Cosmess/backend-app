@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, UseInterceptors, UploadedFile, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseInterceptors, UploadedFile, UseGuards, Req, Query, BadRequestException } from '@nestjs/common';
 import { EstabelecimentoService } from '../../application/services/estabelecimento.service';
 import { EstabelecimentoDto } from '../dtos/estabelecimento/estabelecimento.dto';
 import { Estabelecimento } from '../../domain/entities/estabelecimento.entity';
@@ -33,7 +33,12 @@ export class EstabelecimentoController {
       telefoneVerificado: false
     };
 
-    return this.estabelecimentoService.create(estabelecimento, file);
+    const result = await this.estabelecimentoService.create(estabelecimento, file);
+    if (!result.status) {
+      throw new BadRequestException('Usuário já cadastrado');
+    }
+
+    return result;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -41,7 +46,7 @@ export class EstabelecimentoController {
   @Get()
   async findAll(@Query() dto: GetEstabelecimentoDto, @Req() req: any) {
     const userId = req.user.userId as any;
-    return this.estabelecimentoService.findAll(dto,userId);
+    return this.estabelecimentoService.findAll(dto, userId);
   }
 
   @Get(':id')

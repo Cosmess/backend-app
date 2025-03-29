@@ -79,7 +79,7 @@ export class ProfissionalService {
 
             setTimeout(() => {
                 this.profissionalRepository.update(profissional.id, { codigo: '' });
-            }, 10_000);
+            }, 300_000); // 5 minutes
 
             return new SucessDto(true, 'Codigo de verificação enviado por email');
         } catch (error) {

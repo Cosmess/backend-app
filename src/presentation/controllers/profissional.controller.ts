@@ -21,8 +21,6 @@ export class ProfissionalController {
       id: uuidv4(),
       ...profissionalDto,
       facebook: '',
-      instagram: '',
-      link: '',
       status: '',
       paidStatus: false,
       dateLastPayment: new Date(),

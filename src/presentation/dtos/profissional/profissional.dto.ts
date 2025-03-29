@@ -77,4 +77,17 @@ export class ProfissionalDto {
   @ApiProperty({ type: [String] })
   @IsArray()
   especialidades: string[];
+
+  @ApiProperty()
+  @IsString()
+  facebook: string;
+
+  @ApiProperty()
+  @IsString()
+  instagram: string;
+
+  @ApiProperty()
+  @IsString()
+  link: string;
+  
 }

@@ -56,4 +56,18 @@ export class EmailService {
         return novoCodigo;
     }
 
+    async verificarCodigo(email: string, codigo: string): Promise<boolean> {
+        const profissional = await this.profissionalRepository.findByEmail(email);
+        if (!profissional) {
+            return false;
+        }
+
+        if (profissional.codigo === codigo) {
+            await this.profissionalRepository.update(profissional.id, { emailVerificado: true });
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

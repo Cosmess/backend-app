@@ -1,7 +1,8 @@
 
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { EmailService } from '../../application/services/email.service';
 import { EmailDto } from '../dtos/email/email.dto';
+import { VerificacaoEmailDto } from '../dtos/email/verificacaoEmail.dto';
 
 @Controller('email')
 export class EmailController {
@@ -15,11 +16,11 @@ export class EmailController {
   }
 
   @Post('verify-code')
-  async verificarCodigo(@Body() body: { email: string; codigo: string }) {
-    const codigoCorreto = this.codigosVerificacao.get(body.email);
-    if (codigoCorreto === body.codigo) {
+  async verificarCodigo(@Body() body: VerificacaoEmailDto) {
+    const codigoCorreto = await this.emailService.verificarCodigo(body.email, body.codigo);
+    if (codigoCorreto) {
       return { message: 'E-mail verificado com sucesso!' };
     }
-    throw new Error('Código inválido ou expirado.');
+    return new BadRequestException('Código inválido ou expirado.');
   }
 }
