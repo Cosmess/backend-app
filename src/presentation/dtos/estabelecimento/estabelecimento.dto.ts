@@ -30,6 +30,11 @@ export class EstabelecimentoDto {
   @IsString()
   cep: string;
 
+  
+  @ApiProperty()
+  @IsString()
+  bairro: string;
+
   @ApiProperty()
   @IsString()
   cidade: string;

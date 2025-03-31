@@ -32,7 +32,7 @@ export class EstabelecimentoService {
       let estabelecimentoExists = await this.estabelecimentoRepository.findByCnpj(estabelecimento.cnpj)
       if (estabelecimentoExists) {
         return new SucessDto(false, 'Estabelecimento já cadastrado');
-      }
+      } 
 
       estabelecimentoExists = await this.estabelecimentoRepository.findByEmail(estabelecimento.email)
       if (estabelecimentoExists) {
@@ -61,7 +61,9 @@ export class EstabelecimentoService {
           lng: coordenadas.lng,
           cep: estabelecimento.cep
         }
-
+        
+        await this.geolocalizacaoRepository.create(geolocalizacao);
+      }
         const croValidate = await this.croApiService.buscarPorNumeroRegistro(estabelecimento.croResponsavel);
         if (!croValidate) {
           estabelecimento.status = 'PENDENTE';
@@ -81,10 +83,8 @@ export class EstabelecimentoService {
 
         setTimeout(() => {
           this.estabelecimentoRepository.update(estabelecimento.id, { codigo: '' });
-        }, 10_000);
+        }, 300_000);
 
-        await this.geolocalizacaoRepository.create(geolocalizacao);
-      }
 
       return new SucessDto(true, 'Codigo de verificação enviado por email');
     } catch (error) {
@@ -122,6 +122,7 @@ export class EstabelecimentoService {
           nome: estabelecimento.nome,
           descricao: estabelecimento.descricao,
           cidade: estabelecimento.cidade,
+          bairro: estabelecimento.bairro,
           estado: estabelecimento.estado,
           croResponsavel: estabelecimento.croResponsavel,
           link: estabelecimento.link,

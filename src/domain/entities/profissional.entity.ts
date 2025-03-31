@@ -8,6 +8,7 @@ export class Profissional {
       public endereco: string,
       public numero: string,
       public cep: string,
+      public bairro: string,
       public cidade: string,
       public estado: string,
       public created: Date,

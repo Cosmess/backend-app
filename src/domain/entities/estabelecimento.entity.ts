@@ -9,6 +9,7 @@ export class Estabelecimento {
       public numero: string,
       public celular: string,
       public cep: string,
+      public bairro: string,
       public cidade: string,
       public estado: string,
       public created: Date,

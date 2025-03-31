@@ -30,7 +30,7 @@ export class EstabelecimentoController {
       comentariosId: '',
       planoId: '',
       exibirNumero: estabelecimentoDto.exibirNumero,
-      telefoneVerificado: false
+      telefoneVerificado: false,
     };
 
     const result = await this.estabelecimentoService.create(estabelecimento, file);

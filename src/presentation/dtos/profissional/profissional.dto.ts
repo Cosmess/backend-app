@@ -33,6 +33,10 @@ export class ProfissionalDto {
 
   @ApiProperty()
   @IsString()
+  bairro: string;
+
+  @ApiProperty()
+  @IsString()
   cidade: string;
 
   @ApiProperty()

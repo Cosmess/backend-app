@@ -60,7 +60,7 @@ export class EstabelecimentoRepository {
     const db = this.firebaseService.getFirestore();
 
     const snapshot = await db
-      .collection('profissionais')
+      .collection('estabelecimentos')
       .where('id', 'in', ids)
       .where('status', '==', 'ATIVO')
       .get();
@@ -70,7 +70,7 @@ export class EstabelecimentoRepository {
 
     async findByFiltros(filtros: { cep?: string; cidade?: string; estado?: string; especialidade?: string[] }): Promise<Estabelecimento[]> {
       const db = this.firebaseService.getFirestore();
-      let ref = db.collection('profissionais').where('status', '==', 'ATIVO') as FirebaseFirestore.Query;
+      let ref = db.collection('estabelecimentos').where('status', '==', 'ATIVO') as FirebaseFirestore.Query;
   
       if (filtros.cep) {
         ref = ref.where('cep', '==', filtros.cep);
@@ -80,10 +80,9 @@ export class EstabelecimentoRepository {
         ref = ref.where('estado', '==', filtros.estado);
       }
   
-      if (filtros.especialidade) {
-        ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
+      if (Array.isArray(filtros.especialidade) && filtros.especialidade.length > 0) {
+        ref = ref.where('especialidades', 'array-contains-any', filtros.especialidade);
       }
-  
       const snapshot = await ref.get();
       const result: Estabelecimento[] = [];
   
