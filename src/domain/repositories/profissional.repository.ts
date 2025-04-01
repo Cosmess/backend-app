@@ -10,6 +10,15 @@ export class ProfissionalRepository {
 
   async create(profissional: Profissional): Promise<void> {
     const db = this.firebaseService.getFirestore();
+  
+    if (typeof profissional.especialidades === 'string') {
+      profissional.especialidades = [profissional.especialidades];
+    } else if (!Array.isArray(profissional.especialidades)) {
+      profissional.especialidades = [];
+    }
+  
+    profissional.especialidades = profissional.especialidades.map(e => e.trim().toUpperCase());
+  
     await db.collection(this.collection).doc(profissional.id).set({ ...profissional });
   }
 
@@ -85,7 +94,10 @@ export class ProfissionalRepository {
       ref = ref.where('estado', '==', filtros.estado);
     }
 
-    if (filtros.especialidade) {
+    if (Array.isArray(filtros.especialidade) && filtros.especialidade.length > 0) {
+      const especialidades = filtros.especialidade.map(e => e.trim().toUpperCase());
+      ref = ref.where('especialidades', 'array-contains-any', especialidades);
+    }else{
       ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
     }
 

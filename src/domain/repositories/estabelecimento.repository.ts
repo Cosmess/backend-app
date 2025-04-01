@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 import { Estabelecimento } from '../entities/estabelecimento.entity';
+import { GetEstabelecimentoDto } from 'src/presentation/dtos/estabelecimento/getEstabelecimento.dto';
 
 @Injectable()
 export class EstabelecimentoRepository {
@@ -10,8 +11,18 @@ export class EstabelecimentoRepository {
 
   async create(estabelecimento: Estabelecimento): Promise<void> {
     const db = this.firebaseService.getFirestore();
+  
+    if (typeof estabelecimento.especialidades === 'string') {
+      estabelecimento.especialidades = [estabelecimento.especialidades];
+    } else if (!Array.isArray(estabelecimento.especialidades)) {
+      estabelecimento.especialidades = [];
+    }
+  
+    estabelecimento.especialidades = estabelecimento.especialidades.map(e => e.trim().toUpperCase());
+  
     await db.collection(this.collection).doc(estabelecimento.id).set({ ...estabelecimento });
   }
+  
 
   async findAll(): Promise<Estabelecimento[]> {
     const db = this.firebaseService.getFirestore();
@@ -68,7 +79,7 @@ export class EstabelecimentoRepository {
     return snapshot.docs.map(doc => doc.data() as Estabelecimento);
   }
 
-    async findByFiltros(filtros: { cep?: string; cidade?: string; estado?: string; especialidade?: string[] }): Promise<Estabelecimento[]> {
+    async findByFiltros(filtros: GetEstabelecimentoDto): Promise<Estabelecimento[]> {
       const db = this.firebaseService.getFirestore();
       let ref = db.collection('estabelecimentos').where('status', '==', 'ATIVO') as FirebaseFirestore.Query;
   
@@ -79,9 +90,12 @@ export class EstabelecimentoRepository {
       } else if (filtros.estado) {
         ref = ref.where('estado', '==', filtros.estado);
       }
-  
       if (Array.isArray(filtros.especialidade) && filtros.especialidade.length > 0) {
-        ref = ref.where('especialidades', 'array-contains-any', filtros.especialidade);
+        const especialidades = filtros.especialidade.map(e => e.trim().toUpperCase());
+        ref = ref.where('especialidades', 'array-contains-any', especialidades);
+      }else{
+        ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
+
       }
       const snapshot = await ref.get();
       const result: Estabelecimento[] = [];

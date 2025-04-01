@@ -17,6 +17,11 @@ export class ProfissionalController {
   @UseInterceptors(FileInterceptor('foto'))
   @ApiConsumes('multipart/form-data')
   async create(@UploadedFile() file: File, @Body() profissionalDto: ProfissionalDto) {
+    const especialidades = Array.isArray(profissionalDto.especialidades)
+    ? profissionalDto.especialidades
+    : typeof profissionalDto.especialidades === 'string'
+      ? (profissionalDto.especialidades as string).split(',').map(e => e.trim())
+      : [];
     const profissional: Profissional = {
       id: uuidv4(),
       ...profissionalDto,
@@ -24,7 +29,7 @@ export class ProfissionalController {
       status: '',
       paidStatus: false,
       dateLastPayment: new Date(),
-      especialidades: profissionalDto.especialidades,
+      especialidades: especialidades,
       comentariosId: '',
       planoId: '',
       exibirNumero: profissionalDto.exibirNumero,
