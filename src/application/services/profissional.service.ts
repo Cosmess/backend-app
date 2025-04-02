@@ -27,7 +27,7 @@ export class ProfissionalService {
         private readonly estabelecimentoRepository: EstabelecimentoRepository
     ) { }
 
-    async create(profissional: Profissional,file?: File): Promise<SucessDto> {
+    async create(profissional: Profissional, file?: File): Promise<SucessDto> {
         try {
             let profissionalExists = await this.profissionalRepository.findByCro(profissional.cro);
             if (profissionalExists) {
@@ -73,8 +73,8 @@ export class ProfissionalService {
             profissional.senha = await bcrypt.hash(profissional.senha, salt);
 
             if (file) {
-                profissional.foto = await this.s3service.uploadFile(file,'profissionais');
-              }
+                profissional.foto = await this.s3service.uploadFile(file, 'profissionais');
+            }
             await this.profissionalRepository.create(profissional);
 
             setTimeout(() => {
@@ -106,7 +106,7 @@ export class ProfissionalService {
         const userData = await this.estabelecimentoRepository.findById(userId);
         if (!userData?.cep) return [];
 
-        if(filtros.horarios){
+        if (filtros.horarios) {
             const agendas = await this.agendaService.findByHorario(filtros.horarios)
             if (!agendas) return [];
 
@@ -133,7 +133,7 @@ export class ProfissionalService {
                 return resultado;
             });
         }
-        
+
         if (filtros.cidade && filtros.estado) {
             const filtrados = await this.profissionalRepository.findByFiltros(filtros);
             return filtrados.map((profissional) => {
@@ -212,17 +212,17 @@ export class ProfissionalService {
         const todosProfissionais = await this.profissionalRepository.findAll();
         const profissionaisProximos: Partial<Profissional>[] = [];
 
-        if(filtros.km){
+        if (filtros.km) {
             for (const profissional of todosProfissionais) {
                 if (profissional.cep) {
                     const destino = await this.geolocalizacaoRepository.findByCep(profissional.cep);
-    
+
                     if (destino) {
                         const distancia = await this.geoService.calcularDistancia(
                             { lat: parseFloat(origem.lat), lng: parseFloat(origem.lng) },
                             { lat: parseFloat(destino.lat), lng: parseFloat(destino.lng) }
                         );
-    
+
                         if (distancia <= Number(filtros.km)) {
                             const resultado: Partial<Profissional> = {
                                 nome: profissional.nome,
@@ -238,17 +238,17 @@ export class ProfissionalService {
                                 comentariosId: profissional.comentariosId,
                                 especialidades: profissional.especialidades
                             };
-    
+
                             if (profissional.exibirNumero) {
                                 resultado.celular = profissional.celular;
                             }
-    
+
                             profissionaisProximos.push(resultado);
                         }
                     }
                 }
             }
-    
+
             return profissionaisProximos;
         }
         return todosProfissionais;
@@ -258,30 +258,36 @@ export class ProfissionalService {
     async findById(id: string): Promise<any | null> {
         const profissionalData = await this.profissionalRepository.findById(id);
         if (!profissionalData) return null;
-      
+
         const agendaDisponivel = await this.agendaService.findByTomador(id);
 
-        const profissional: Partial<Profissional> = {
-          nome: profissionalData.nome,
-          descricao: profissionalData.descricao,
-          cidade: profissionalData.cidade,
-          estado: profissionalData.estado,
-          cro: profissionalData.cro,
-          link: profissionalData.link,
-          instagram: profissionalData.instagram,
-          facebook: profissionalData.facebook,
-          foto: profissionalData.foto,
-          cep: profissionalData.cep,
-          comentariosId: profissionalData.comentariosId,
-          especialidades: profissionalData.especialidades
-        };
-      
+          const profissional: Partial<Profissional> = {
+                    id: profissionalData.id,
+                    nome: profissionalData.nome,
+                    email: profissionalData.email,
+                    celular: profissionalData.celular,
+                    endereco: profissionalData.endereco,
+                    cep: profissionalData.cep,
+                    numero: profissionalData.numero,
+                    cidade: profissionalData.cidade,
+                    bairro: profissionalData.bairro,
+                    estado: profissionalData.estado,
+                    descricao: profissionalData.descricao,
+                    link: profissionalData.link,
+                    instagram: profissionalData.instagram,
+                    cro: profissionalData.cro,
+                    foto: profissionalData.foto,
+                    exibirNumero: profissionalData.exibirNumero,
+                    especialidades: profissionalData.especialidades,
+                };
+        
+
         if (profissionalData.exibirNumero) {
             profissionalData.celular = profissionalData.celular;
         }
-      
-        return {profissionalData, agendaDisponivel};
-      }
+
+        return { profissionalData: profissional, agendaDisponivel };
+    }
 
     async update(id: string, data: Partial<Profissional>): Promise<void> {
         return this.profissionalRepository.update(id, data);

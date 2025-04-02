@@ -119,6 +119,7 @@ export class EstabelecimentoService {
       const profissionais = await this.estabelecimentoRepository.findByIds(agendaIds.filter(id => id !== undefined));
       return profissionais.map((estabelecimento) => {
         const resultado: Partial<Estabelecimento> = {
+          id: estabelecimento.id,
           nome: estabelecimento.nome,
           descricao: estabelecimento.descricao,
           cidade: estabelecimento.cidade,
@@ -144,6 +145,7 @@ export class EstabelecimentoService {
       const filtrados = await this.estabelecimentoRepository.findByFiltros(filtros);
       return filtrados.map((estabelecimento) => {
         const resultado: Partial<Estabelecimento> = {
+          id: estabelecimento.id,
           nome: estabelecimento.nome,
           descricao: estabelecimento.descricao,
           cidade: estabelecimento.cidade,
@@ -168,6 +170,7 @@ export class EstabelecimentoService {
       const filtrados = await this.estabelecimentoRepository.findByFiltros(filtros);
       return filtrados.map((estabelecimento) => {
         const resultado: Partial<Estabelecimento> = {
+          id: estabelecimento.id,
           nome: estabelecimento.nome,
           descricao: estabelecimento.descricao,
           cidade: estabelecimento.cidade,
@@ -193,6 +196,7 @@ export class EstabelecimentoService {
       const filtrados = await this.estabelecimentoRepository.findByFiltros(filtros);
       return filtrados.map((estabelecimento) => {
         const resultado: Partial<Estabelecimento> = {
+          id: estabelecimento.id,
           nome: estabelecimento.nome,
           descricao: estabelecimento.descricao,
           cidade: estabelecimento.cidade,
@@ -232,6 +236,7 @@ export class EstabelecimentoService {
 
             if (distancia <= Number(filtros.km)) {
               const resultado: Partial<Estabelecimento> = {
+                id: estabelecimento.id,
                 nome: estabelecimento.nome,
                 descricao: estabelecimento.descricao,
                 cidade: estabelecimento.cidade,
@@ -258,12 +263,65 @@ export class EstabelecimentoService {
 
       return estabelecimentosProximos;
     }
-    return todosEstabelecimentos;
+    
+    return todosEstabelecimentos.map((estabelecimentoData) => {
+      const estabelecimento: Partial<Estabelecimento> = {
+      id: estabelecimentoData.id,
+      nome: estabelecimentoData.nome,
+      email: estabelecimentoData.email,
+      celular: estabelecimentoData.exibirNumero ? estabelecimentoData.celular : undefined,
+      endereco: estabelecimentoData.endereco,
+      cep: estabelecimentoData.cep,
+      numero: estabelecimentoData.numero,
+      cidade: estabelecimentoData.cidade,
+      bairro: estabelecimentoData.bairro,
+      estado: estabelecimentoData.estado,
+      descricao: estabelecimentoData.descricao,
+      cnpj: estabelecimentoData.cnpj,
+      link: estabelecimentoData.link,
+      instagram: estabelecimentoData.instagram,
+      croResponsavel: estabelecimentoData.croResponsavel,
+      razao: estabelecimentoData.razao,
+      foto: estabelecimentoData.foto,
+      especialidades: estabelecimentoData.especialidades,
+      };
+      return estabelecimento;
+    });
   }
 
-  async findById(id: string): Promise<Estabelecimento | null> {
-    return this.estabelecimentoRepository.findById(id);
-  }
+  async findById(id: string): Promise<any | null> {
+        const estabelecimentoData = await this.estabelecimentoRepository.findById(id);
+        if (!estabelecimentoData) return null;
+
+        const agendaDisponivel = await this.agendaService.findByTomador(id);
+
+        const estabelecimento: Partial<Estabelecimento> = {
+            id: estabelecimentoData.id,
+            nome: estabelecimentoData.nome,
+            email: estabelecimentoData.email,
+            celular: estabelecimentoData.celular,
+            endereco: estabelecimentoData.endereco,
+            cep: estabelecimentoData.cep,
+            numero: estabelecimentoData.numero,
+            cidade: estabelecimentoData.cidade,
+            bairro: estabelecimentoData.bairro,
+            estado: estabelecimentoData.estado,
+            descricao: estabelecimentoData.descricao,
+            cnpj: estabelecimentoData.cnpj,
+            link: estabelecimentoData.link,
+            instagram: estabelecimentoData.instagram,
+            croResponsavel: estabelecimentoData.croResponsavel,
+            razao: estabelecimentoData.razao,
+            foto: estabelecimentoData.foto,
+            exibirNumero: estabelecimentoData.exibirNumero,
+            especialidades: estabelecimentoData.especialidades,
+        };
+
+        if (estabelecimentoData.exibirNumero) {
+          estabelecimentoData.celular = estabelecimentoData.celular;
+        }
+        return { estabelecimentoData: estabelecimento, agendaDisponivel };
+    }
 
   async update(id: string, data: Partial<Estabelecimento>): Promise<void> {
     return this.estabelecimentoRepository.update(id, data);
