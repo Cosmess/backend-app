@@ -56,7 +56,7 @@ export class EstabelecimentoController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Get()
+  @Get(':id')
   async findById(@Param('id') id: string) {
     return this.estabelecimentoService.findById(id);
   }

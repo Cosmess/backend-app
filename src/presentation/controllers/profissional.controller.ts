@@ -55,14 +55,23 @@ export class ProfissionalController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get(':id')
-  async findById(@Req() req: any) {
-    const userId = req.user.userId as any;
-    return this.profissionalService.findById(userId);
+  async findById(@Param('id') id: string,@Req() req: any) {
+    let dataId ;
+    dataId = id;
+    if (!id) {
+      dataId = req.user.userId as any;
+    }
+    return this.profissionalService.findById(dataId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: Partial<ProfissionalDto>) {
-    return this.profissionalService.update(id, data);
+  @UseInterceptors(FileInterceptor('foto'))
+  @ApiConsumes('multipart/form-data')
+  async update(@UploadedFile() file: File,@Param('id') id: string, @Body() data: ProfissionalDto, @Req() req: any) {
+    const userId = req.user.userId as any;
+    return this.profissionalService.update(id, data, userId,file);
   }
 
   @Delete(':id')

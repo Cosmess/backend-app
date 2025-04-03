@@ -64,7 +64,7 @@ export class EstabelecimentoService {
         
         await this.geolocalizacaoRepository.create(geolocalizacao);
       }
-        const croValidate = await this.croApiService.buscarPorNumeroRegistro(estabelecimento.croResponsavel);
+        const croValidate = await this.croApiService.buscarPorNumeroRegistro(estabelecimento.cro);
         if (!croValidate) {
           estabelecimento.status = 'PENDENTE';
         } else if (croValidate.situacao === 'ATIVO') {
@@ -125,7 +125,7 @@ export class EstabelecimentoService {
           cidade: estabelecimento.cidade,
           bairro: estabelecimento.bairro,
           estado: estabelecimento.estado,
-          croResponsavel: estabelecimento.croResponsavel,
+          cro: estabelecimento.cro,
           link: estabelecimento.link,
           instagram: estabelecimento.instagram,
           facebook: estabelecimento.facebook,
@@ -150,7 +150,7 @@ export class EstabelecimentoService {
           descricao: estabelecimento.descricao,
           cidade: estabelecimento.cidade,
           estado: estabelecimento.estado,
-          croResponsavel: estabelecimento.croResponsavel,
+          cro: estabelecimento.cro,
           link: estabelecimento.link,
           instagram: estabelecimento.instagram,
           facebook: estabelecimento.facebook,
@@ -175,7 +175,7 @@ export class EstabelecimentoService {
           descricao: estabelecimento.descricao,
           cidade: estabelecimento.cidade,
           estado: estabelecimento.estado,
-          croResponsavel: estabelecimento.croResponsavel,
+          cro: estabelecimento.cro,
           link: estabelecimento.link,
           instagram: estabelecimento.instagram,
           facebook: estabelecimento.facebook,
@@ -201,7 +201,7 @@ export class EstabelecimentoService {
           descricao: estabelecimento.descricao,
           cidade: estabelecimento.cidade,
           estado: estabelecimento.estado,
-          croResponsavel: estabelecimento.croResponsavel,
+          cro: estabelecimento.cro,
           link: estabelecimento.link,
           instagram: estabelecimento.instagram,
           facebook: estabelecimento.facebook,
@@ -241,7 +241,7 @@ export class EstabelecimentoService {
                 descricao: estabelecimento.descricao,
                 cidade: estabelecimento.cidade,
                 estado: estabelecimento.estado,
-                croResponsavel: estabelecimento.croResponsavel,
+                cro: estabelecimento.cro,
                 link: estabelecimento.link,
                 instagram: estabelecimento.instagram,
                 facebook: estabelecimento.facebook,
@@ -280,7 +280,7 @@ export class EstabelecimentoService {
       cnpj: estabelecimentoData.cnpj,
       link: estabelecimentoData.link,
       instagram: estabelecimentoData.instagram,
-      croResponsavel: estabelecimentoData.croResponsavel,
+      cro: estabelecimentoData.cro,
       razao: estabelecimentoData.razao,
       foto: estabelecimentoData.foto,
       especialidades: estabelecimentoData.especialidades,
@@ -310,7 +310,7 @@ export class EstabelecimentoService {
             cnpj: estabelecimentoData.cnpj,
             link: estabelecimentoData.link,
             instagram: estabelecimentoData.instagram,
-            croResponsavel: estabelecimentoData.croResponsavel,
+            cro: estabelecimentoData.cro,
             razao: estabelecimentoData.razao,
             foto: estabelecimentoData.foto,
             exibirNumero: estabelecimentoData.exibirNumero,
@@ -320,7 +320,7 @@ export class EstabelecimentoService {
         if (estabelecimentoData.exibirNumero) {
           estabelecimentoData.celular = estabelecimentoData.celular;
         }
-        return { estabelecimentoData: estabelecimento, agendaDisponivel };
+        return { Data: estabelecimento, agendaDisponivel };
     }
 
   async update(id: string, data: Partial<Estabelecimento>): Promise<void> {

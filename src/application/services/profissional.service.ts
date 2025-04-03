@@ -286,10 +286,16 @@ export class ProfissionalService {
             profissionalData.celular = profissionalData.celular;
         }
 
-        return { profissionalData: profissional, agendaDisponivel };
+        return { Data: profissional, agendaDisponivel };
     }
 
-    async update(id: string, data: Partial<Profissional>): Promise<void> {
+    async update(id: string, data: Partial<Profissional>, userId: string,file?: File): Promise<void> {
+        if (userId != id){
+            throw new BadRequestException('Você não tem permissão para atualizar este profissional');
+        }
+        if (file) {
+            data.foto = await this.s3service.uploadFile(file, 'profissionais');
+        }
         return this.profissionalRepository.update(id, data);
     }
 

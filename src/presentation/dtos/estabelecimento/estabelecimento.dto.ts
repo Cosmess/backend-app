@@ -16,7 +16,7 @@ export class EstabelecimentoDto {
 
   @ApiProperty()
   @IsString()
-  croResponsavel: string;
+  cro: string;
 
   @ApiProperty()
   @IsString()

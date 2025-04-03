@@ -4,7 +4,7 @@ export class Estabelecimento {
       public nome: string,
       public razao: string,
       public cnpj: string,
-      public croResponsavel: string,
+      public cro: string,
       public endereco: string,
       public numero: string,
       public celular: string,

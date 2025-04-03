@@ -78,7 +78,7 @@ export class ConviteService {
                             descricao: profissional.descricao,
                             cidade: profissional.cidade,
                             estado: profissional.estado,
-                            cro: profissional.croResponsavel,
+                            cro: profissional.cro,
                             celular: profissional.celular,
                             link: profissional.link,
                             instagram: profissional.instagram,
