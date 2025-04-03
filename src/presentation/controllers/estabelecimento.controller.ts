@@ -64,8 +64,11 @@ export class EstabelecimentoController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: Partial<EstabelecimentoDto>) {
-    return this.estabelecimentoService.update(id, data);
+  @UseInterceptors(FileInterceptor('foto'))
+  @ApiConsumes('multipart/form-data')
+  async update(@UploadedFile() file: File,@Param('id') id: string, @Body() data: Partial<EstabelecimentoDto>,@Req() req: any) {
+    const userId = req.user.userId as any;
+    return this.estabelecimentoService.update(id, data,userId,file);
   }
 
   @Delete(':id')

@@ -303,3 +303,4 @@ export class ProfissionalService {
         return this.profissionalRepository.delete(id);
     }
 }
+

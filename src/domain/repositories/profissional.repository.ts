@@ -74,6 +74,15 @@ export class ProfissionalRepository {
 
   async update(id: string, data: Partial<Profissional>): Promise<void> {
     const db = this.firebaseService.getFirestore();
+
+    if (typeof data.especialidades === 'string') {
+      data.especialidades = [data.especialidades];
+    } else if (!Array.isArray(data.especialidades)) {
+      data.especialidades = [];
+    }
+  
+    data.especialidades = data.especialidades.map(e => e.trim().toUpperCase());
+  
     await db.collection(this.collection).doc(id).update(data);
   }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { EstabelecimentoRepository } from '../../domain/repositories/estabelecimento.repository';
 import { Estabelecimento } from '../../domain/entities/estabelecimento.entity';
 import * as bcrypt from 'bcrypt';
@@ -32,7 +32,7 @@ export class EstabelecimentoService {
       let estabelecimentoExists = await this.estabelecimentoRepository.findByCnpj(estabelecimento.cnpj)
       if (estabelecimentoExists) {
         return new SucessDto(false, 'Estabelecimento já cadastrado');
-      } 
+      }
 
       estabelecimentoExists = await this.estabelecimentoRepository.findByEmail(estabelecimento.email)
       if (estabelecimentoExists) {
@@ -61,29 +61,29 @@ export class EstabelecimentoService {
           lng: coordenadas.lng,
           cep: estabelecimento.cep
         }
-        
+
         await this.geolocalizacaoRepository.create(geolocalizacao);
       }
-        const croValidate = await this.croApiService.buscarPorNumeroRegistro(estabelecimento.cro);
-        if (!croValidate) {
-          estabelecimento.status = 'PENDENTE';
-        } else if (croValidate.situacao === 'ATIVO') {
-          estabelecimento.status = 'ATIVO';
-        } else {
-          estabelecimento.status = croValidate.situacao;
-        }
+      const croValidate = await this.croApiService.buscarPorNumeroRegistro(estabelecimento.cro);
+      if (!croValidate) {
+        estabelecimento.status = 'PENDENTE';
+      } else if (croValidate.situacao === 'ATIVO') {
+        estabelecimento.status = 'ATIVO';
+      } else {
+        estabelecimento.status = croValidate.situacao;
+      }
 
-        const salt = await bcrypt.genSalt(10);
-        estabelecimento.senha = await bcrypt.hash(estabelecimento.senha, salt);
+      const salt = await bcrypt.genSalt(10);
+      estabelecimento.senha = await bcrypt.hash(estabelecimento.senha, salt);
 
-        if (file) {
-          estabelecimento.foto = await this.s3service.uploadFile(file, 'estabelecimentos');
-        }
-        await this.estabelecimentoRepository.create(estabelecimento);
+      if (file) {
+        estabelecimento.foto = await this.s3service.uploadFile(file, 'estabelecimentos');
+      }
+      await this.estabelecimentoRepository.create(estabelecimento);
 
-        setTimeout(() => {
-          this.estabelecimentoRepository.update(estabelecimento.id, { codigo: '' });
-        }, 300_000);
+      setTimeout(() => {
+        this.estabelecimentoRepository.update(estabelecimento.id, { codigo: '' });
+      }, 300_000);
 
 
       return new SucessDto(true, 'Codigo de verificação enviado por email');
@@ -263,13 +263,43 @@ export class EstabelecimentoService {
 
       return estabelecimentosProximos;
     }
-    
+
     return todosEstabelecimentos.map((estabelecimentoData) => {
       const estabelecimento: Partial<Estabelecimento> = {
+        id: estabelecimentoData.id,
+        nome: estabelecimentoData.nome,
+        email: estabelecimentoData.email,
+        celular: estabelecimentoData.exibirNumero ? estabelecimentoData.celular : undefined,
+        endereco: estabelecimentoData.endereco,
+        cep: estabelecimentoData.cep,
+        numero: estabelecimentoData.numero,
+        cidade: estabelecimentoData.cidade,
+        bairro: estabelecimentoData.bairro,
+        estado: estabelecimentoData.estado,
+        descricao: estabelecimentoData.descricao,
+        cnpj: estabelecimentoData.cnpj,
+        link: estabelecimentoData.link,
+        instagram: estabelecimentoData.instagram,
+        cro: estabelecimentoData.cro,
+        razao: estabelecimentoData.razao,
+        foto: estabelecimentoData.foto,
+        especialidades: estabelecimentoData.especialidades,
+      };
+      return estabelecimento;
+    });
+  }
+
+  async findById(id: string): Promise<any | null> {
+    const estabelecimentoData = await this.estabelecimentoRepository.findById(id);
+    if (!estabelecimentoData) return null;
+
+    const agendaDisponivel = await this.agendaService.findByTomador(id);
+
+    const estabelecimento: Partial<Estabelecimento> = {
       id: estabelecimentoData.id,
       nome: estabelecimentoData.nome,
       email: estabelecimentoData.email,
-      celular: estabelecimentoData.exibirNumero ? estabelecimentoData.celular : undefined,
+      celular: estabelecimentoData.celular,
       endereco: estabelecimentoData.endereco,
       cep: estabelecimentoData.cep,
       numero: estabelecimentoData.numero,
@@ -283,47 +313,23 @@ export class EstabelecimentoService {
       cro: estabelecimentoData.cro,
       razao: estabelecimentoData.razao,
       foto: estabelecimentoData.foto,
+      exibirNumero: estabelecimentoData.exibirNumero,
       especialidades: estabelecimentoData.especialidades,
-      };
-      return estabelecimento;
-    });
+    };
+
+    if (estabelecimentoData.exibirNumero) {
+      estabelecimentoData.celular = estabelecimentoData.celular;
+    }
+    return { Data: estabelecimento, agendaDisponivel };
   }
 
-  async findById(id: string): Promise<any | null> {
-        const estabelecimentoData = await this.estabelecimentoRepository.findById(id);
-        if (!estabelecimentoData) return null;
-
-        const agendaDisponivel = await this.agendaService.findByTomador(id);
-
-        const estabelecimento: Partial<Estabelecimento> = {
-            id: estabelecimentoData.id,
-            nome: estabelecimentoData.nome,
-            email: estabelecimentoData.email,
-            celular: estabelecimentoData.celular,
-            endereco: estabelecimentoData.endereco,
-            cep: estabelecimentoData.cep,
-            numero: estabelecimentoData.numero,
-            cidade: estabelecimentoData.cidade,
-            bairro: estabelecimentoData.bairro,
-            estado: estabelecimentoData.estado,
-            descricao: estabelecimentoData.descricao,
-            cnpj: estabelecimentoData.cnpj,
-            link: estabelecimentoData.link,
-            instagram: estabelecimentoData.instagram,
-            cro: estabelecimentoData.cro,
-            razao: estabelecimentoData.razao,
-            foto: estabelecimentoData.foto,
-            exibirNumero: estabelecimentoData.exibirNumero,
-            especialidades: estabelecimentoData.especialidades,
-        };
-
-        if (estabelecimentoData.exibirNumero) {
-          estabelecimentoData.celular = estabelecimentoData.celular;
-        }
-        return { Data: estabelecimento, agendaDisponivel };
+  async update(id: string, data: Partial<Estabelecimento>, userId: string, file?: File): Promise<void> {
+    if (userId != id) {
+      throw new BadRequestException('Você não tem permissão para atualizar este profissional');
     }
-
-  async update(id: string, data: Partial<Estabelecimento>): Promise<void> {
+    if (file) {
+      data.foto = await this.s3service.uploadFile(file, 'profissionais');
+    }
     return this.estabelecimentoRepository.update(id, data);
   }
 
