@@ -73,18 +73,23 @@ export class ProfissionalRepository {
   }
 
   async update(id: string, data: Partial<Profissional>): Promise<void> {
-    const db = this.firebaseService.getFirestore();
+    try {
+      const db = this.firebaseService.getFirestore();
 
-    if (typeof data.especialidades === 'string') {
-      const especialidadesArray = (data.especialidades as string).split(',');
-      data.especialidades = especialidadesArray;
-    } else if (!Array.isArray(data.especialidades)) {
-      data.especialidades = [];
+      if (typeof data.especialidades === 'string') {
+        const especialidadesArray = (data.especialidades as string).split(',');
+        data.especialidades = especialidadesArray;
+      } else if (!Array.isArray(data.especialidades)) {
+        data.especialidades = [];
+      }
+    
+      data.especialidades = data.especialidades.map(e => e.trim().toUpperCase());
+    
+      await db.collection(this.collection).doc(id).update(data);
+    } catch (error) {
+      console.error('Error updating document:', error);
+      return error.message;
     }
-  
-    data.especialidades = data.especialidades.map(e => e.trim().toUpperCase());
-  
-    await db.collection(this.collection).doc(id).update(data);
   }
 
   async delete(id: string): Promise<void> {
