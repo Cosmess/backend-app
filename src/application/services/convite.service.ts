@@ -7,12 +7,15 @@ import { ProfissionalRepository } from 'src/domain/repositories/profissional.rep
 import { AlterarStatusConviteDto } from 'src/presentation/dtos/convite/alterarStatusConvite.dto';
 import { AgendaRepository } from 'src/domain/repositories/agenda.repository';
 import { GetConviteDto } from 'src/presentation/dtos/convite/getConvite.dto';
+import { Estabelecimento } from 'src/domain/entities/estabelecimento.entity';
+import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
 
 @Injectable()
 export class ConviteService {
     constructor(private readonly conviteRepository: ConviteRepository,
         private readonly profissionalRepository: ProfissionalRepository,
-        private readonly agendaRepository: AgendaRepository
+        private readonly agendaRepository: AgendaRepository,
+        private readonly estabelecimentoRepository: EstabelecimentoRepository
     ) { }
 
     async create(convite: CriarConviteDto, userId: string): Promise<void> {
@@ -49,13 +52,47 @@ export class ConviteService {
             convites = await this.conviteRepository.findByPrestador(id);
         }
 
+        if(convites === undefined || convites.length === 0){
+            return [];
+        }
+        // Filtra os convites que possuem prestadorId e agendaId definidos
         const convitesValidos = convites.filter(c => c.prestadorId);
         const idsPrestadores = convitesValidos.map(c => c.prestadorId).filter(id => id !== undefined);
         const convitesAgendas = convites.filter(c => c.agendaId);
         const idsAgendas = convitesAgendas.map(c => c.agendaId).filter(id => id !== undefined);
-
-        const profissionais = await this.profissionalRepository.findByIds(idsPrestadores as string[]);
         const agendas = await this.agendaRepository.findByIds(idsAgendas)
+
+        let profissionais = await this.profissionalRepository.findByIds(idsPrestadores as string[]);
+        if (profissionais.length === 0) {
+
+            const profissionais = await this.estabelecimentoRepository.findByIds(idsPrestadores as string[]);
+            return convitesValidos.map(convite => {
+                const profissional = profissionais.find(p => p.id === convite.prestadorId);
+                const agenda = agendas.find(p => p.id === convite.agendaId);
+                return {
+                    convite: convite,
+                    agenda: agenda,
+                    profissional: profissional
+                        ? {
+                            nome: profissional.nome,
+                            descricao: profissional.descricao,
+                            cidade: profissional.cidade,
+                            estado: profissional.estado,
+                            cro: profissional.croResponsavel,
+                            celular: profissional.celular,
+                            link: profissional.link,
+                            instagram: profissional.instagram,
+                            facebook: profissional.facebook,
+                            foto: profissional.foto,
+                            cep: profissional.cep,
+                            comentariosId: profissional.comentariosId,
+                            especialidades: profissional.especialidades,
+                        }
+                        : null,
+                };
+            });
+        }
+
 
         return convitesValidos.map(convite => {
             const profissional = profissionais.find(p => p.id === convite.prestadorId);
@@ -70,6 +107,7 @@ export class ConviteService {
                         cidade: profissional.cidade,
                         estado: profissional.estado,
                         cro: profissional.cro,
+                        celular: profissional.celular,
                         link: profissional.link,
                         instagram: profissional.instagram,
                         facebook: profissional.facebook,
@@ -88,6 +126,9 @@ export class ConviteService {
             let convite = await this.conviteRepository.findByIdAndTomador(dto.conviteId, userId);
             if (convite) {
                 if (convite) {
+                    if(userId !== convite.tomadorId){
+                        throw new Error('Você não tem permissão para alterar este convite.');
+                    }
                     convite.status = dto.status;
                     return this.conviteRepository.update(convite.id, convite);
                 }

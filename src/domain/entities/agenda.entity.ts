@@ -1,7 +1,7 @@
 export class Agenda {
     constructor(
       public id: string,
-      public horario?: Date,
+      public horario?: string,
       public status?: string,
       public tomadorId?: string,
       public prestadorId?: string,

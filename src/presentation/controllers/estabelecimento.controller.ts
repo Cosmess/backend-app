@@ -54,11 +54,15 @@ export class EstabelecimentoController {
     return this.estabelecimentoService.findAll(dto, userId);
   }
 
-  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get()
   async findById(@Param('id') id: string) {
     return this.estabelecimentoService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Put(':id')
   async update(@Param('id') id: string, @Body() data: Partial<EstabelecimentoDto>) {
     return this.estabelecimentoService.update(id, data);

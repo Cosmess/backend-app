@@ -5,6 +5,7 @@ import { Agenda } from '../../domain/entities/agenda.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
+import { ExcluirAgendaDto } from '../dtos/agenda/excluirAgenda.dto';
 
 @Controller('agendas')
 export class AgendaController {
@@ -18,9 +19,23 @@ export class AgendaController {
         return this.agendaService.create(agendaDto, userId);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     @Get()
-    async findAll() {
-        return this.agendaService.findAll();
+    async findAll(@Req() req: any) {
+        const userId = req.user.userId as any;
+        return this.agendaService.findAll(userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @Delete()
+    async update(@Body() dto: ExcluirAgendaDto, @Req() req: any) {
+        const userId = req.user.userId as any;
+        if (!dto.agendaId) {
+            throw new Error('Agenda ID is required');
+        }
+        return this.agendaService.delete(dto.agendaId, userId);
     }
 
 }

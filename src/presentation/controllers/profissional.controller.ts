@@ -52,9 +52,12 @@ export class ProfissionalController {
     return this.profissionalService.findAll(dto,userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get(':id')
-  async findById(@Param('id') id: string) {
-    return this.profissionalService.findById(id);
+  async findById(@Req() req: any) {
+    const userId = req.user.userId as any;
+    return this.profissionalService.findById(userId);
   }
 
   @Put(':id')

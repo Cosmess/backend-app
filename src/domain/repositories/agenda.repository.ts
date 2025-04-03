@@ -14,10 +14,20 @@ export class AgendaRepository {
         await db.collection(this.collection).doc(agenda.id).set({ ...agenda });
     }
 
-    async findAll(): Promise<Agenda[]> {
+    async findAll(id: string): Promise<Agenda[]> {
         const db = this.firebaseService.getFirestore();
-        const snapshot = await db.collection(this.collection).get();
-        return snapshot.docs.map(doc => doc.data() as Agenda);
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const snapshot = await db
+            .collection(this.collection)
+            .where('tomadorId', '==', id)
+            .where('status', '==', 'ABERTO')
+            .get();
+
+        const agendas = snapshot.docs.map(doc => doc.data() as Agenda);
+
+        return agendas.filter(agenda => agenda.horario && new Date(agenda.horario) >= yesterday);
     }
 
     async update(id: string, data: Partial<Agenda>): Promise<void> {
@@ -25,9 +35,18 @@ export class AgendaRepository {
         await db.collection(this.collection).doc(id).update(data);
     }
 
-    async delete(id: string): Promise<void> {
+    async delete(id: string, userId: string): Promise<void> {
         const db = this.firebaseService.getFirestore();
-        await db.collection(this.collection).doc(id).delete();
+        const snapshot = await db
+            .collection(this.collection)
+            .where('id', '==', id)
+            .where('tomadorId', '==', userId)
+            .get();
+
+        if (!snapshot.empty) {
+            const doc = snapshot.docs[0];
+            await doc.ref.delete();
+        }
     }
 
     async findByTomador(id: string): Promise<Agenda[]> {

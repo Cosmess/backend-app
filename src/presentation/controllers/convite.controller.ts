@@ -35,5 +35,4 @@ export class ConviteController {
         return this.conviteService.alterarConvite(userId, dto);
     }
 
-
 }
