@@ -76,7 +76,8 @@ export class ProfissionalRepository {
     const db = this.firebaseService.getFirestore();
 
     if (typeof data.especialidades === 'string') {
-      data.especialidades = [data.especialidades];
+      const especialidadesArray = (data.especialidades as string).split(',');
+      data.especialidades = especialidadesArray;
     } else if (!Array.isArray(data.especialidades)) {
       data.especialidades = [];
     }

@@ -66,7 +66,7 @@ export class EstabelecimentoRepository {
       data.especialidades = [];
     }
 
-    
+
     data.especialidades = data.especialidades.map(e => e.trim().toUpperCase());
   
     await db.collection(this.collection).doc(id).update(data);
@@ -95,16 +95,17 @@ export class EstabelecimentoRepository {
   
       if (filtros.cep) {
         ref = ref.where('cep', '==', filtros.cep);
-      } else if (filtros.cidade) {
+      } else if (filtros.cidade && filtros.estado) {
         ref = ref.where('cidade', '==', filtros.cidade);
-      } else if (filtros.estado) {
         ref = ref.where('estado', '==', filtros.estado);
       }
       if (Array.isArray(filtros.especialidade) && filtros.especialidade.length > 0) {
         const especialidades = filtros.especialidade.map(e => e.trim().toUpperCase());
         ref = ref.where('especialidades', 'array-contains-any', especialidades);
       }else{
-        ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
+        if(filtros.especialidade){
+          ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
+        }
 
       }
       const snapshot = await ref.get();

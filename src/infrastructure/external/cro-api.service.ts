@@ -28,12 +28,15 @@ export class CroApiService {
     
     try {
       const response = await axios.post(url, data, { headers });
+      if(response.data.data[0].length ===0){
+        return {situacao: 'PENDENTE'}
+      }
       const situacao = response.data.data[0].Situacao;
       const situacaoDetalhe = response.data.data[0].SituacaoDetalhe;
       const numeroRegistro = response.data.data[0].NumeroRegistro;
       return {situacao,situacaoDetalhe,numeroRegistro}
     } catch (error) {
-      throw new Error(`Erro ao consultar CRO-SP: ${error.message}`);
+      return {situacao: 'PENDENTE'}
     }
   }
 }

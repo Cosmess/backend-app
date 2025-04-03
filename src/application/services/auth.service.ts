@@ -11,7 +11,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly profissionalService: ProfissionalService,
     private readonly estabelecimentoService: EstabelecimentoService
-  ) {}
+  ) { }
 
   async login(authDto: AuthDto): Promise<{ token: string; payload: any }> {
     try {
@@ -23,18 +23,21 @@ export class AuthService {
       } else if (type === 'estabelecimento') {
         user = await this.estabelecimentoService.findByEmailOrPhone(emailOrPhone);
       } else {
-        throw new UnauthorizedException('Tipo de usuário inválido');
+        throw new UnauthorizedException('Credenciais inválidas');
       }
-      if(!user.emailVerificado){
+      if(!user){
+        throw new UnauthorizedException('Credenciais inválidas!');
+      }
+      if (!user.emailVerificado) {
         throw new UnauthorizedException('email não verificado!');
       }
       if (!user || !(await bcrypt.compare(senha, user.senha))) {
         throw new UnauthorizedException('Credenciais inválidas');
       }
-  
+
       const payload = { sub: user.id, email: user.email, type };
       const token = await this.jwtService.signAsync(payload);
-  
+
       return { token, payload };
     } catch (error) {
       console.error(error.message);
