@@ -11,7 +11,10 @@ export class EmailController {
 
   @Post('send-verification')
   async enviarCodigo(@Body() body: EmailDto) {
-    await this.emailService.renviarCodigoVerificacao(body.email);
+    const result = await this.emailService.renviarCodigoVerificacao(body.email);
+    if(!result.success){
+      throw new BadRequestException('Email invalido ou não existe!');
+    }
     return { message: 'Código enviado!' };
   }
 

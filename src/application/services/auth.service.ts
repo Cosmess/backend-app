@@ -7,6 +7,9 @@ import { AuthDto } from '../../presentation/dtos/auth/auth.dto';
 import { ChangePassword } from 'src/presentation/dtos/auth/changePassword.dto';
 import { ProfissionalRepository } from 'src/domain/repositories/profissional.repository';
 import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
+import { ChangeStatus } from 'src/presentation/dtos/auth/changeStatus.dto';
+import { ResetPassword } from 'src/presentation/dtos/auth/resetPassword.dto';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +18,8 @@ export class AuthService {
     private readonly profissionalService: ProfissionalService,
     private readonly estabelecimentoService: EstabelecimentoService,
     private readonly profissionalRepository: ProfissionalRepository,
-    private readonly estabelecimentoRepository: EstabelecimentoRepository
+    private readonly estabelecimentoRepository: EstabelecimentoRepository,
+    private readonly emailService: EmailService,
   ) { }
 
   async login(authDto: AuthDto): Promise<{ token: string; payload: any }> {
@@ -35,6 +39,9 @@ export class AuthService {
       }
       if (!user.emailVerificado) {
         throw new UnauthorizedException('email não verificado!');
+      }
+      if (user.status === 'INATIVO') {
+        throw new UnauthorizedException('Usuario Bloqueado!');
       }
       if (!user || !(await bcrypt.compare(senha, user.senha))) {
         throw new UnauthorizedException('Credenciais inválidas');
@@ -88,4 +95,69 @@ export class AuthService {
     }
   }
 
+  async changeStatus(authDto: ChangeStatus, userId: string): Promise<any> {
+    try {
+      let user;
+      if (authDto.type === 'profissional') {
+        user = await this.profissionalRepository.findById(userId);
+      } else if (authDto.type === 'estabelecimento') {
+        user = await this.estabelecimentoRepository.findById(userId);
+      } else {
+        throw new UnauthorizedException('Credenciais inválidas');
+      }
+
+      if (!user) {
+        throw new UnauthorizedException('Credenciais inválidas!');
+      }
+
+      user.status = authDto.status;
+
+      if (authDto.type === 'profissional') {
+        await this.profissionalRepository.update(userId, user);
+      } else {
+        await this.estabelecimentoRepository.update(userId, user)
+      }
+
+      return { succes: true };
+    } catch (error) {
+      console.error(error.message);
+      throw new UnauthorizedException('Credenciais inválidas!');
+    }
+  }
+
+  async resetPassword(authDto: ResetPassword): Promise<boolean> {
+    try {
+      const codigoCorreto = await this.emailService.verificarCodigo(authDto.email, authDto.codigo);
+      if(!codigoCorreto) {
+        return false
+      }
+
+      let user: any
+      let isProfissional = true;
+      user = await this.profissionalRepository.findByEmail(authDto.email);
+  
+      if (!user) {
+          user = await this.estabelecimentoRepository.findByEmail(authDto.email);
+          isProfissional = false;
+      }
+      if (!user) {
+          false
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      user.senha = await bcrypt.hash(authDto.newPassword, salt);
+      user.codigo = '';
+
+      if (isProfissional) {
+        await this.profissionalRepository.update(user.id, user);
+      } else {
+        await this.estabelecimentoRepository.update(user, user)
+      }
+
+      return true;
+    } catch (error) {
+      console.error(error.message);
+      return false;
+    }
+  }
 }

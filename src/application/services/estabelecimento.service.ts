@@ -39,6 +39,11 @@ export class EstabelecimentoService {
         return new SucessDto(false, 'Estabelecimento já cadastrado');
       }
 
+      const emailExists = await this.profissionalRepository.findByEmail(estabelecimento.email)
+      if (emailExists) {
+        return new SucessDto(false, 'Email já cadastrado');
+      }
+
       const isValidCnpj = await validarCNPJ(estabelecimento.cnpj);
       if (!isValidCnpj) {
         return new SucessDto(false, 'CNPJ Invalido');
@@ -132,7 +137,7 @@ export class EstabelecimentoService {
           foto: estabelecimento.foto,
           cep: estabelecimento.cep,
           comentariosId: estabelecimento.comentariosId,
-          especialidades: estabelecimento.especialidades
+          especialidades: estabelecimento.especialidades,
         };
         if (estabelecimento.exibirNumero) {
           resultado.celular = estabelecimento.celular;
@@ -299,7 +304,7 @@ export class EstabelecimentoService {
       id: estabelecimentoData.id,
       nome: estabelecimentoData.nome,
       email: estabelecimentoData.email,
-      celular: estabelecimentoData.celular,
+      celular: estabelecimentoData.exibirNumero ? estabelecimentoData.celular : undefined,
       endereco: estabelecimentoData.endereco,
       cep: estabelecimentoData.cep,
       numero: estabelecimentoData.numero,

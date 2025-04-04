@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { randomInt } from 'crypto';
 import { ProfissionalRepository } from 'src/domain/repositories/profissional.repository';
+import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
 
 @Injectable()
 export class EmailService {
-    constructor(private readonly profissionalRepository: ProfissionalRepository) {}
+    constructor(private readonly profissionalRepository: ProfissionalRepository,
+        private readonly estabelecimentoRepository: EstabelecimentoRepository,
+    ) { }
     private ses = new SESClient({
         region: process.env.AWS_REGION,
         credentials: {
@@ -16,7 +19,7 @@ export class EmailService {
 
     async enviarCodigoVerificacao(email: string): Promise<string> {
         try {
-            const codigo = randomInt(100000, 999999).toString(); 
+            const codigo = randomInt(100000, 999999).toString();
 
             const params = {
                 Source: process.env.AWS_EMAIL_FROM,
@@ -39,31 +42,54 @@ export class EmailService {
 
     }
 
-    async renviarCodigoVerificacao(email: string): Promise<string> {
-        const profissional = await this.profissionalRepository.findByEmail(email);
-        if (!profissional) {
-            throw new Error('Profissional não encontrado');
+    async renviarCodigoVerificacao(email: string): Promise<any> {
+        let user: any
+        let isProfissional = true;
+        user = await this.profissionalRepository.findByEmail(email);
+        if (!user) {
+            user = await this.estabelecimentoRepository.findByEmail(email);
+            isProfissional = false;
+        }
+        if (!user) {
+            return { success: false, codigo: null };
         }
 
+
         const novoCodigo = await this.enviarCodigoVerificacao(email);
-        await this.profissionalRepository.update(profissional.id, { codigo: novoCodigo });
 
-        // Limpa o código após 5 minutos (300_000 ms)
+        if (isProfissional) {
+            await this.profissionalRepository.update(user.id, { codigo: novoCodigo });
+                    // Limpa o código após 5 minutos (300_000 ms)
         setTimeout(() => {
-            this.profissionalRepository.update(profissional.id, { codigo: '' });
+            this.profissionalRepository.update(user.id, { codigo: '' });
         }, 300_000);
+        }
+        else {
+            await this.estabelecimentoRepository.update(user.id, { codigo: novoCodigo });
+                    // Limpa o código após 5 minutos (300_000 ms)
+        setTimeout(() => {
+            this.profissionalRepository.update(user.id, { codigo: '' });
+        }, 300_000);
+        }
 
-        return novoCodigo;
+        return { success: true, codigo: novoCodigo };
     }
 
     async verificarCodigo(email: string, codigo: string): Promise<boolean> {
-        const profissional = await this.profissionalRepository.findByEmail(email);
-        if (!profissional) {
-            return false;
+
+        let user: any
+        let isProfissional = true;
+        user = await this.profissionalRepository.findByEmail(email);
+    
+        if (!user) {
+            user = await this.estabelecimentoRepository.findByEmail(email);
+            isProfissional = false;
+        }
+        if (!user) {
+            false
         }
 
-        if (profissional.codigo === codigo) {
-            await this.profissionalRepository.update(profissional.id, { emailVerificado: true });
+        if (user.codigo === codigo) {
             return true;
         } else {
             return false;

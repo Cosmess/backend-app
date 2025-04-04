@@ -39,6 +39,11 @@ export class ProfissionalService {
                 return new SucessDto(false, 'Usuário já cadastrado');
             }
 
+            const emailExists = await this.estabelecimentoRepository.findByEmail(profissional.email)
+            if (emailExists) {
+                return new SucessDto(false, 'Email já cadastrado');
+            }
+
             const codigo = await this.emailService.enviarCodigoVerificacao(profissional.email);
             profissional.codigo = codigo;
 
@@ -261,26 +266,26 @@ export class ProfissionalService {
 
         const agendaDisponivel = await this.agendaService.findByTomador(id);
 
-          const profissional: Partial<Profissional> = {
-                    id: profissionalData.id,
-                    nome: profissionalData.nome,
-                    email: profissionalData.email,
-                    celular: profissionalData.celular,
-                    endereco: profissionalData.endereco,
-                    cep: profissionalData.cep,
-                    numero: profissionalData.numero,
-                    cidade: profissionalData.cidade,
-                    bairro: profissionalData.bairro,
-                    estado: profissionalData.estado,
-                    descricao: profissionalData.descricao,
-                    link: profissionalData.link,
-                    instagram: profissionalData.instagram,
-                    cro: profissionalData.cro,
-                    foto: profissionalData.foto,
-                    exibirNumero: profissionalData.exibirNumero,
-                    especialidades: profissionalData.especialidades,
-                };
-        
+        const profissional: Partial<Profissional> = {
+            id: profissionalData.id,
+            nome: profissionalData.nome,
+            email: profissionalData.email,
+            celular: profissionalData.exibirNumero ? profissionalData.celular : undefined,
+            endereco: profissionalData.endereco,
+            cep: profissionalData.cep,
+            numero: profissionalData.numero,
+            cidade: profissionalData.cidade,
+            bairro: profissionalData.bairro,
+            estado: profissionalData.estado,
+            descricao: profissionalData.descricao,
+            link: profissionalData.link,
+            instagram: profissionalData.instagram,
+            cro: profissionalData.cro,
+            foto: profissionalData.foto,
+            exibirNumero: profissionalData.exibirNumero,
+            especialidades: profissionalData.especialidades,
+        };
+
 
         if (profissionalData.exibirNumero) {
             profissionalData.celular = profissionalData.celular;
@@ -289,12 +294,20 @@ export class ProfissionalService {
         return { Data: profissional, agendaDisponivel };
     }
 
-    async update(id: string, data: Partial<Profissional>, userId: string,file?: File): Promise<void> {
-        if (userId != id){
+    async update(id: string, data: Partial<Profissional>, userId: string, file?: File): Promise<void> {
+        if (userId != id) {
             throw new BadRequestException('Você não tem permissão para atualizar este profissional');
         }
         if (file) {
             data.foto = await this.s3service.uploadFile(file, 'profissionais');
+        }
+        if (typeof data.exibirNumero === 'string') {
+            if (data.exibirNumero === 'true') {
+                data.exibirNumero = true;
+            } else if (data.exibirNumero === 'false') {
+                data.exibirNumero = false;
+            }
+
         }
         return this.profissionalRepository.update(id, data);
     }
