@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import { FirebaseService } from './firebase.service';
 process.env.FIRESTORE_USE_REST = 'true';
 process.env.GRPC_SSL_CIPHER_SUITES = 'HIGH+ECDSA';
-
+console.log('FIREBASE_PRIVATE_KEY', process.env.FIREBASE_PRIVATE_KEY);
 @Module({
   providers: [
     {
