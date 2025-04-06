@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 import { Convite } from '../entities/convite.entity';
-import { Timestamp } from 'firebase-admin/firestore';
 
 @Injectable()
 export class ConviteRepository {
