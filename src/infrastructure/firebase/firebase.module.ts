@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import { FirebaseService } from './firebase.service';
+process.env.FIRESTORE_USE_REST = 'true';
+process.env.GRPC_SSL_CIPHER_SUITES = 'HIGH+ECDSA';
 
 @Module({
   providers: [
