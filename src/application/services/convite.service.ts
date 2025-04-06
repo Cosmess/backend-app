@@ -100,6 +100,7 @@ export class ConviteService {
                             cep: profissional.cep,
                             comentariosId: profissional.comentariosId,
                             especialidades: profissional.especialidades,
+                            idProfissional: profissional.id,
                         }
                         : null,
                 };
@@ -136,6 +137,8 @@ export class ConviteService {
                         cep: profissional.cep,
                         comentariosId: profissional.comentariosId,
                         especialidades: profissional.especialidades,
+                        idProfissional: profissional.id,
+
                     }
                     : null,
             };

@@ -44,26 +44,20 @@ export class ProfissionalService {
                 return new SucessDto(false, 'Email já cadastrado');
             }
 
-            const codigo = await this.emailService.enviarCodigoVerificacao(profissional.email);
-            profissional.codigo = codigo;
-
             const geolocalizacaoExists = await this.geolocalizacaoRepository.findByCep(profissional.cep);
             if (!geolocalizacaoExists) {
                 const coordenadas = await this.geoService.obterLatLngPorCep(profissional.cep);
-                if (!coordenadas) {
-                    throw new Error('Falha ao obter coordenadas');
-                }
+                if (coordenadas) {
+                    const geolocalizacao: Geolocalizacao = {
+                        id: uuidv4(),
+                        lat: coordenadas.lat,
+                        lng: coordenadas.lng,
+                        cep: profissional.cep
+                    }
 
-                const geolocalizacao: Geolocalizacao = {
-                    id: uuidv4(),
-                    lat: coordenadas.lat,
-                    lng: coordenadas.lng,
-                    cep: profissional.cep
+                    await this.geolocalizacaoRepository.create(geolocalizacao);
                 }
-
-                await this.geolocalizacaoRepository.create(geolocalizacao);
             }
-
 
             const croValidate = await this.croApiService.buscarPorNumeroRegistro(profissional.cro);
             if (!croValidate) {
@@ -78,9 +72,17 @@ export class ProfissionalService {
             profissional.senha = await bcrypt.hash(profissional.senha, salt);
 
             if (file) {
-                profissional.foto = await this.s3service.uploadFile(file, 'profissionais');
+                const fileName = await this.s3service.uploadFile(file, 'estabelecimentos');
+                if(!fileName.success){
+                    return new SucessDto(false, fileName.message);
+                }
+                profissional.foto = fileName.message;
             }
+
+            const codigo = await this.emailService.enviarCodigoVerificacao(profissional.email);
+            profissional.codigo = codigo;
             await this.profissionalRepository.create(profissional);
+
 
             setTimeout(() => {
                 this.profissionalRepository.update(profissional.id, { codigo: '' });
@@ -299,7 +301,8 @@ export class ProfissionalService {
             throw new BadRequestException('Você não tem permissão para atualizar este profissional');
         }
         if (file) {
-            data.foto = await this.s3service.uploadFile(file, 'profissionais');
+            const fileName = await this.s3service.uploadFile(file, 'estabelecimentos');            
+            data.foto = fileName.message;
         }
         if (typeof data.exibirNumero === 'string') {
             if (data.exibirNumero === 'true') {

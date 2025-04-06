@@ -13,11 +13,13 @@ export class S3Service {
     },
   });
 
-  async uploadFile(file: File, folder = 'profissionais'): Promise<string> {
-    if (!file) throw new Error('Arquivo não enviado');
+  async uploadFile(file: File, folder = 'profissionais'): Promise<{ success: boolean; message: string }> {
+    if (!file) {
+      return { success: false, message: 'Arquivo não enviado' };
+    }
 
-    if (file.size > 1 * 1024 * 1024) { // 1MB
-      throw new Error('Tamanho máximo permitido: 1MB');
+    if (file.size > 5 * 1024 * 1024) { // 5MB
+      return { success: false, message: 'Tamanho máximo permitido: 5MB' };
     }
 
     const extension = file.originalname.split('.').pop();
@@ -31,8 +33,14 @@ export class S3Service {
       //ACL: 'public-read',
     });
 
-    await this.s3.send(command);
-
-    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
+    try {
+      await this.s3.send(command);
+      return {
+        success: true,
+        message: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`,
+      };
+    } catch (error) {
+      return { success: false, message: '' };
+    }
   }
 }

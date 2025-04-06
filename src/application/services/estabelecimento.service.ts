@@ -49,25 +49,20 @@ export class EstabelecimentoService {
         return new SucessDto(false, 'CNPJ Invalido');
       }
 
-
-      const codigo = await this.emailService.enviarCodigoVerificacao(estabelecimento.email)
-      estabelecimento.codigo = codigo;
-
       const geolocalizacaoExists = await this.geolocalizacaoRepository.findByCep(estabelecimento.cep);
       if (!geolocalizacaoExists) {
         const coordenadas = await this.geoService.obterLatLngPorCep(estabelecimento.cep);
-        if (!coordenadas) {
-          throw new Error('Falha ao obter coordenadas');
+        if (coordenadas) {
+          const geolocalizacao: Geolocalizacao = {
+            id: uuidv4(),
+            lat: coordenadas.lat,
+            lng: coordenadas.lng,
+            cep: estabelecimento.cep
+          }
+
+          await this.geolocalizacaoRepository.create(geolocalizacao);
         }
 
-        const geolocalizacao: Geolocalizacao = {
-          id: uuidv4(),
-          lat: coordenadas.lat,
-          lng: coordenadas.lng,
-          cep: estabelecimento.cep
-        }
-
-        await this.geolocalizacaoRepository.create(geolocalizacao);
       }
       const croValidate = await this.croApiService.buscarPorNumeroRegistro(estabelecimento.cro);
       if (!croValidate) {
@@ -82,9 +77,18 @@ export class EstabelecimentoService {
       estabelecimento.senha = await bcrypt.hash(estabelecimento.senha, salt);
 
       if (file) {
-        estabelecimento.foto = await this.s3service.uploadFile(file, 'estabelecimentos');
+        const fileName = await this.s3service.uploadFile(file, 'estabelecimentos');
+        if(!fileName.success){
+          return new SucessDto(false, fileName.message);
       }
+        estabelecimento.foto = fileName.message;
+      }
+
+      const codigo = await this.emailService.enviarCodigoVerificacao(estabelecimento.email)
+      estabelecimento.codigo = codigo;
+
       await this.estabelecimentoRepository.create(estabelecimento);
+
 
       setTimeout(() => {
         this.estabelecimentoRepository.update(estabelecimento.id, { codigo: '' });
@@ -333,7 +337,8 @@ export class EstabelecimentoService {
       throw new BadRequestException('Você não tem permissão para atualizar este profissional');
     }
     if (file) {
-      data.foto = await this.s3service.uploadFile(file, 'profissionais');
+      const fileName = await this.s3service.uploadFile(file, 'estabelecimentos');
+      data.foto = fileName.message;
     }
     return this.estabelecimentoRepository.update(id, data);
   }
