@@ -24,6 +24,6 @@ export class EmailController {
     if (codigoCorreto) {
       return { message: 'E-mail verificado com sucesso!' };
     }
-    return new BadRequestException('Código inválido ou expirado.');
+    throw new BadRequestException('Código inválido ou expirado.');
   }
 }
