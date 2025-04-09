@@ -34,31 +34,36 @@ export class AuthService {
       } else if (type === 'estabelecimento') {
         user = await this.estabelecimentoService.findByEmailOrPhone(emailOrPhone);
       } else {
-        throw new UnauthorizedException('Credenciais inválidas');
+        throw new UnauthorizedException('Tipo de usuário inválido');
       }
+
       if (!user) {
-        throw new UnauthorizedException('Credenciais inválidas!');
+        throw new UnauthorizedException('Usuário não encontrado');
       }
+
       if (!user.emailVerificado) {
-        throw new UnauthorizedException('email não verificado!');
+        throw new UnauthorizedException('E-mail não verificado');
       }
+
       if (user.status === 'INATIVO') {
-        throw new UnauthorizedException('Usuario Bloqueado!');
+        throw new UnauthorizedException('Usuário bloqueado');
       }
-      if(user.paidStatus === false) {
+
+      if (user.paidStatus === false) {
         const pagamento = await this.pagamentoService.findByEmail(emailOrPhone);
-        if(!pagamento) {
-          throw new UnauthorizedException('Usuario sem pagamento!');
+        if (!pagamento) {
+          throw new UnauthorizedException('Pagamento pendente');
         }
-        if(pagamento.status !== 'approved') {
-          throw new UnauthorizedException('Usuario sem pagamento!');
+        if (pagamento.status !== 'approved') {
+          throw new UnauthorizedException('Pagamento pendente');
         }
-        if(pagamento.status === 'approved') {
+        if (pagamento.status === 'approved') {
           await this.pagamentoService.setPaymentStatus(emailOrPhone);
-        }        
+        }
       }
+
       if (!user || !(await bcrypt.compare(senha, user.senha))) {
-        throw new UnauthorizedException('Credenciais inválidas');
+        throw new UnauthorizedException('Senha inválida');
       }
 
       const payload = { sub: user.id, email: user.email, type };
@@ -67,9 +72,8 @@ export class AuthService {
       return { token, payload };
     } catch (error) {
       console.error(error.message);
-      return { token: '', payload: null };
+      throw error; 
     }
-
   }
 
   async updatePassword(authDto: ChangePassword, userId: string): Promise<any> {

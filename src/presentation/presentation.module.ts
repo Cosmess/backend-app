@@ -31,6 +31,7 @@ import { MercadoPagoService } from 'src/application/services/mercado-pago.servic
 import { PagamentoController } from './controllers/pagamento.controller';
 import { PagamentoRepository } from 'src/domain/repositories/paamento.repository';
 import { PagamentoService } from 'src/application/services/pagamento.service';
+import { PlanoRepository } from 'src/domain/repositories/plano.repository';
 
 @Module({
   imports: [
@@ -74,7 +75,8 @@ import { PagamentoService } from 'src/application/services/pagamento.service';
     S3Service,
     MercadoPagoService,
     PagamentoRepository,
-    PagamentoService
+    PagamentoService,
+    PlanoRepository
   ],
 })
 export class PresentationModule {}

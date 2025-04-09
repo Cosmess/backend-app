@@ -3,7 +3,7 @@ import { PagamentoRepository } from '../../domain/repositories/paamento.reposito
 import { Pagamento } from '../../domain/entities/pagamento.entity';
 import { ProfissionalRepository } from 'src/domain/repositories/profissional.repository';
 import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
-import moment from 'moment';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class PagamentoService {
@@ -38,20 +38,14 @@ export class PagamentoService {
         let estabelecimento : any = null;
         if (usuario) {
             usuario.paidStatus = true;
-            usuario.dateLastPayment = moment(new Date())
-                .tz('America/Sao_Paulo')
-                .startOf('hour')
-                .toDate();
+            usuario.dateLastPayment = moment().tz('America/Sao_Paulo').toDate();
             await this.profissionalRepository.update(usuario.id, usuario);
         }
         else if (!usuario) {
             estabelecimento = await this.estabelecimentoRepository.findByEmail(email);
             if (estabelecimento) {
                 estabelecimento.paidStatus = true;
-                estabelecimento.dateLastPayment = moment(new Date())
-                    .tz('America/Sao_Paulo')
-                    .startOf('hour')
-                    .toDate();
+                estabelecimento.dateLastPayment = moment().tz('America/Sao_Paulo').toDate();
                 await this.estabelecimentoRepository.update(estabelecimento.id, estabelecimento);
             }
         }

@@ -3,6 +3,8 @@ import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
 import { PagamentoService } from './pagamento.service';
 import { Pagamento } from 'src/domain/entities/pagamento.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { PlanoRepository } from 'src/domain/repositories/plano.repository';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class MercadoPagoService {
@@ -10,24 +12,28 @@ export class MercadoPagoService {
     private preference: Preference;
     private payment: Payment;
 
-    constructor(private readonly pagamentoService: PagamentoService) {
+    constructor(private readonly pagamentoService: PagamentoService,
+        private readonly planoRepository : PlanoRepository,
+    ) {
         this.mercadopago = new MercadoPagoConfig({
             accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
         });
 
         this.preference = new Preference(this.mercadopago);
-        this.payment = new Payment(this.mercadopago); // ✅ instância separada
+        this.payment = new Payment(this.mercadopago);
 
     }
 
     async criarPreferencia(email: string) {
+        const plano = await this.planoRepository.findOne();
+    
         const response = await this.preference.create({
             body: {
                 items: [
                     {
-                        title: 'Assinatura DentsFreela',
+                        title: plano.descricao || 'Assinatura Mensal DentsFreela',
                         quantity: 1,
-                        unit_price: 0.9,
+                        unit_price: plano.valor || 19.99,
                         id: ''
                     },
                 ],
@@ -38,8 +44,8 @@ export class MercadoPagoService {
                     email,
                 },
                 back_urls: {
-                    success: 'https://seusite.com.br/sucesso',
-                    failure: 'http://localhost:53364',
+                    success: 'https://dentsfreela.com.br',
+                    failure: 'https://dentsfreela.com.br/termos_condicoes.html',
                 },
                 auto_return: 'approved',
             },
@@ -52,14 +58,14 @@ export class MercadoPagoService {
                 id: uuidv4(),
                 email: email,
                 status: 'criado',
-                atualizacao: '',
+                atualizacao: moment().tz('America/Sao_Paulo').format(),
                 pagamentoId: '',
                 data: JSON.stringify(response),
             };
             await this.pagamentoService.create(pagamentoData);
         } else {
             pagamentoData!.status = 'criado';
-            pagamentoData!.atualizacao = new Date().toISOString();
+            pagamentoData!.atualizacao = moment().tz('America/Sao_Paulo').format();
             this.pagamentoService.update(pagamentoData!.id, pagamentoData!);
         }
         console.log('💳 Pagamento criado:', response.init_point);
@@ -78,14 +84,16 @@ export class MercadoPagoService {
                     id: uuidv4(),
                     email: email,
                     status: pagamento.status,
-                    atualizacao: '',
+                    atualizacao: moment().tz('America/Sao_Paulo').format(),
                     pagamentoId: pagamento.id ? String(pagamento.id) : '',
                     data: JSON.stringify(pagamento),
                 };
                 await this.pagamentoService.create(pagamentoData);
             } else {
-                pagamentoData!.status = pagamento.status;
-                pagamentoData!.atualizacao = new Date().toISOString();
+                if(pagamentoData!.status !== 'approved') {
+                    pagamentoData!.status = pagamento.status;
+                }
+                pagamentoData!.atualizacao = moment().tz('America/Sao_Paulo').format();
                 pagamentoData!.data = JSON.stringify(pagamento);
                 this.pagamentoService.update(pagamentoData!.id, pagamentoData!);
             }
