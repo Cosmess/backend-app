@@ -44,8 +44,8 @@ export class MercadoPagoService {
                     email,
                 },
                 back_urls: {
-                    success: 'https://dentsfreela.com.br',
-                    failure: 'https://dentsfreela.com.br/termos_condicoes.html',
+                    success: 'https://dentsfreela.com.br/app',
+                    failure: 'https://dentsfreela.com.br/app',
                 },
                 auto_return: 'approved',
             },
