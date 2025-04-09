@@ -16,6 +16,7 @@ export class EmailService {
             secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
         },
     });
+
     async enviarCodigoVerificacao(email: string): Promise<string> {
         try {
             const codigo = randomInt(100000, 999999).toString();
@@ -100,6 +101,106 @@ export class EmailService {
                                         </div>
                                         <div class="footer">
                                             <p>Se você não solicitou este código, ignore este email.</p>
+                                        </div>
+                                    </div>
+                                </body>
+                                </html>
+                            `,
+                        },
+                    },
+                },
+            };
+
+            await this.ses.send(new SendEmailCommand(params));
+
+            return codigo;
+        } catch (error) {
+            console.error(error.message);
+            return "";
+        }
+    }
+
+    
+    async enviarEmail(email: string, title: string ,body: string): Promise<string> {
+        try {
+            const codigo = randomInt(100000, 999999).toString();
+
+            const params = {
+                Source: process.env.AWS_EMAIL_FROM,
+                Destination: { ToAddresses: [email] },
+                Message: {
+                    Subject: { Data: 'Código de Verificação' },
+                    Body: {
+                        Html: {
+                            Data: `
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <title>Código de Verificação</title>
+                                    <style>
+                                        body {
+                                            font-family: Arial, sans-serif;
+                                            background-color: #f4f4f4;
+                                            margin: 0;
+                                            padding: 0;
+                                        }
+                                        .email-container {
+                                            max-width: 600px;
+                                            margin: 20px auto;
+                                            background: #ffffff;
+                                            padding: 20px;
+                                            border-radius: 8px;
+                                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                                        }
+                                        .header {
+                                            text-align: center;
+                                            margin-bottom: 20px;
+                                        }
+                                        .header img {
+                                            max-width: 150px;
+                                        }
+                                        .content {
+                                            text-align: center;
+                                            color: #333333;
+                                        }
+                                        .content h1 {
+                                            font-size: 24px;
+                                            margin-bottom: 10px;
+                                        }
+                                        .content p {
+                                            font-size: 16px;
+                                            margin-bottom: 20px;
+                                        }
+                                        .code {
+                                            display: inline-block;
+                                            font-size: 20px;
+                                            font-weight: bold;
+                                            color: #ffffff;
+                                            background-color: #007bff;
+                                            padding: 10px 20px;
+                                            border-radius: 5px;
+                                            text-decoration: none;
+                                        }
+                                        .footer {
+                                            text-align: center;
+                                            margin-top: 20px;
+                                            font-size: 12px;
+                                            color: #777777;
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="email-container">
+                                        <div class="header">
+                                            <img src="https://dentsfreela.s3.us-east-1.amazonaws.com/logo.png" alt="Logo">
+                                        </div>
+                                        <div class="content">
+                                            <h1>Sua assinatura</h1>
+                                            <p>Olá</p>
+                                            <p>${title}</p>
+                                             <p>${body}</p>
                                         </div>
                                     </div>
                                 </body>

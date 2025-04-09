@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
+import './infrastructure/cron/pagamento-cron';
 
 dotenv.config();
 const port = process.env.PORT || 3000;

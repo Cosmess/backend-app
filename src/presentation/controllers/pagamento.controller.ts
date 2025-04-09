@@ -5,7 +5,7 @@ import { PagamentoDto } from '../dtos/pagamento/pagamento.dto';
 
 @Controller('pagamento')
 export class PagamentoController {
-  constructor(private readonly mercadoPagoService: MercadoPagoService) {}
+  constructor(private readonly mercadoPagoService: MercadoPagoService) { }
 
   @Post('checkout')
   async criarCheckout(@Body() body: PagamentoDto) {
@@ -18,11 +18,13 @@ export class PagamentoController {
   async receberWebhook(@Body() body: any) {
     console.log('📩 Webhook recebido:', JSON.stringify(body));
 
-    const tipo = body.type;
-    const id = body.data?.id;
+    if (body) {
+      const tipo = body.type;
+      const id = body.data?.id;
 
-    if (tipo === 'payment' && id) {
-      await this.mercadoPagoService.tratarPagamentoPendente(id);
+      if (tipo === 'payment' && id) {
+        await this.mercadoPagoService.tratarPagamentoPendente(id);
+      }
     }
 
     return { received: true };
