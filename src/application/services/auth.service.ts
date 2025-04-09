@@ -10,6 +10,7 @@ import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimen
 import { ChangeStatus } from 'src/presentation/dtos/auth/changeStatus.dto';
 import { ResetPassword } from 'src/presentation/dtos/auth/resetPassword.dto';
 import { EmailService } from './email.service';
+import { PagamentoService } from './pagamento.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly profissionalRepository: ProfissionalRepository,
     private readonly estabelecimentoRepository: EstabelecimentoRepository,
     private readonly emailService: EmailService,
+    private readonly pagamentoService: PagamentoService,
   ) { }
 
   async login(authDto: AuthDto): Promise<{ token: string; payload: any }> {
@@ -42,6 +44,18 @@ export class AuthService {
       }
       if (user.status === 'INATIVO') {
         throw new UnauthorizedException('Usuario Bloqueado!');
+      }
+      if(user.paidStatus === false) {
+        const pagamento = await this.pagamentoService.findByEmail(emailOrPhone);
+        if(!pagamento) {
+          throw new UnauthorizedException('Usuario sem pagamento!');
+        }
+        if(pagamento.status !== 'approved') {
+          throw new UnauthorizedException('Usuario sem pagamento!');
+        }
+        if(pagamento.status === 'approved') {
+          await this.pagamentoService.setPaymentStatus(emailOrPhone);
+        }        
       }
       if (!user || !(await bcrypt.compare(senha, user.senha))) {
         throw new UnauthorizedException('Credenciais inválidas');

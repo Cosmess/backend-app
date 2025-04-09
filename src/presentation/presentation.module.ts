@@ -27,6 +27,10 @@ import { ConviteController } from './controllers/convite.controller';
 import { ConviteService } from 'src/application/services/convite.service';
 import { ConviteRepository } from 'src/domain/repositories/convite.repository';
 import { S3Service } from 'src/infrastructure/s3/s3.service';
+import { MercadoPagoService } from 'src/application/services/mercado-pago.service';
+import { PagamentoController } from './controllers/pagamento.controller';
+import { PagamentoRepository } from 'src/domain/repositories/paamento.repository';
+import { PagamentoService } from 'src/application/services/pagamento.service';
 
 @Module({
   imports: [
@@ -46,7 +50,8 @@ import { S3Service } from 'src/infrastructure/s3/s3.service';
     EmailController,
     EspecialidadeController,
     AgendaController,
-    ConviteController
+    ConviteController,
+    PagamentoController
   ],
   providers: [
     ProfissionalService,
@@ -66,7 +71,10 @@ import { S3Service } from 'src/infrastructure/s3/s3.service';
     AgendaRepository,
     ConviteService,
     ConviteRepository,
-    S3Service
+    S3Service,
+    MercadoPagoService,
+    PagamentoRepository,
+    PagamentoService
   ],
 })
 export class PresentationModule {}
