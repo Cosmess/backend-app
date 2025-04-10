@@ -25,7 +25,6 @@ export class ProfissionalController {
     const profissional: Profissional = {
       id: uuidv4(),
       ...profissionalDto,
-      facebook: '',
       status: '',
       paidStatus: false,
       dateLastPayment: new Date(),

@@ -26,7 +26,10 @@ export class EstabelecimentoRepository {
 
   async findAll(): Promise<Estabelecimento[]> {
     const db = this.firebaseService.getFirestore();
-    const snapshot = await db.collection(this.collection).get();
+    const snapshot = await db
+      .collection(this.collection)
+      .where('paidStatus', '==', true)
+      .get();
     return snapshot.docs.map(doc => doc.data() as Estabelecimento);
   }
 
@@ -92,7 +95,7 @@ export class EstabelecimentoRepository {
     const snapshot = await db
       .collection('estabelecimentos')
       .where('id', 'in', ids)
-      .where('status', '==', 'ATIVO')
+      .where('paidStatus', '==', true)
       .get();
 
     return snapshot.docs.map(doc => doc.data() as Estabelecimento);

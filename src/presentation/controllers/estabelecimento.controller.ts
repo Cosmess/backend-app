@@ -25,7 +25,6 @@ export class EstabelecimentoController {
     const estabelecimento: Estabelecimento = {
       id: uuidv4(),
       ...estabelecimentoDto,
-      facebook: '',
       instagram: '',
       link: '',
       status: '',

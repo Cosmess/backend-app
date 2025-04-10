@@ -5,7 +5,8 @@ export class Convite {
       public tomadorId?: string,
       public prestadorId?: string,
       public mensagem?: string,
-      public agendaId?: string
+      public agendaId?: string,
+      public horario?: string,
     ) {}
   }
   

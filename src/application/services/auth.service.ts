@@ -26,15 +26,18 @@ export class AuthService {
 
   async login(authDto: AuthDto): Promise<{ token: string; payload: any }> {
     try {
-      const { emailOrPhone, senha, type } = authDto;
-
+      const { emailOrPhone, senha } = authDto;
       let user;
-      if (type === 'profissional') {
-        user = await this.profissionalService.findByEmailOrPhone(emailOrPhone);
-      } else if (type === 'estabelecimento') {
+      let type;
+
+      user = await this.profissionalService.findByEmailOrPhone(emailOrPhone);
+      type = 'profissional';
+      if (!user) {
         user = await this.estabelecimentoService.findByEmailOrPhone(emailOrPhone);
-      } else {
-        throw new UnauthorizedException('Tipo de usuário inválido');
+        type = 'estabelecimento';
+        if (!user) {
+          throw new UnauthorizedException('Usuário não encontrado');
+        }
       }
 
       if (!user) {
@@ -72,7 +75,7 @@ export class AuthService {
       return { token, payload };
     } catch (error) {
       console.error(error.message);
-      throw error; 
+      throw error;
     }
   }
 
@@ -146,20 +149,20 @@ export class AuthService {
   async resetPassword(authDto: ResetPassword): Promise<boolean> {
     try {
       const codigoCorreto = await this.emailService.verificarCodigo(authDto.email, authDto.codigo);
-      if(!codigoCorreto) {
+      if (!codigoCorreto) {
         return false
       }
 
       let user: any
       let isProfissional = true;
       user = await this.profissionalRepository.findByEmail(authDto.email);
-  
+
       if (!user) {
-          user = await this.estabelecimentoRepository.findByEmail(authDto.email);
-          isProfissional = false;
+        user = await this.estabelecimentoRepository.findByEmail(authDto.email);
+        isProfissional = false;
       }
       if (!user) {
-          false
+        false
       }
 
       const salt = await bcrypt.genSalt(10);

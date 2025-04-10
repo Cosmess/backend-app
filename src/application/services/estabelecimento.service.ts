@@ -49,21 +49,6 @@ export class EstabelecimentoService {
         return new SucessDto(false, 'CNPJ Invalido');
       }
 
-      const geolocalizacaoExists = await this.geolocalizacaoRepository.findByCep(estabelecimento.cep);
-      if (!geolocalizacaoExists) {
-        const coordenadas = await this.geoService.obterLatLngPorCep(estabelecimento.cep);
-        if (coordenadas) {
-          const geolocalizacao: Geolocalizacao = {
-            id: uuidv4(),
-            lat: coordenadas.lat,
-            lng: coordenadas.lng,
-            cep: estabelecimento.cep
-          }
-
-          await this.geolocalizacaoRepository.create(geolocalizacao);
-        }
-
-      }
       const croValidate = await this.croApiService.buscarPorNumeroRegistro(estabelecimento.cro);
       if (!croValidate) {
         estabelecimento.status = 'PENDENTE';
@@ -134,7 +119,6 @@ export class EstabelecimentoService {
           cro: estabelecimento.cro,
           link: estabelecimento.link,
           instagram: estabelecimento.instagram,
-          facebook: estabelecimento.facebook,
           foto: estabelecimento.foto,
           cep: estabelecimento.cep,
           comentariosId: estabelecimento.comentariosId,

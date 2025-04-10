@@ -9,6 +9,8 @@ import { AgendaRepository } from 'src/domain/repositories/agenda.repository';
 import { GetConviteDto } from 'src/presentation/dtos/convite/getConvite.dto';
 import { Estabelecimento } from 'src/domain/entities/estabelecimento.entity';
 import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
+import * as moment from 'moment-timezone';
+import { SucessDto } from 'src/presentation/dtos/success.dto';
 
 @Injectable()
 export class ConviteService {
@@ -18,17 +20,38 @@ export class ConviteService {
         private readonly estabelecimentoRepository: EstabelecimentoRepository
     ) { }
 
-    async create(convite: CriarConviteDto, userId: string): Promise<void> {
-        const conviteData: Convite = {
+    async create(convite: CriarConviteDto, userId: string): Promise<SucessDto> {
+        try {
+
+            const conviteExistente = await this.conviteRepository.findByPrestadorAndAgendaId(userId, convite.agendaId);
+            if(conviteExistente) {
+            return new SucessDto(false, 'Você já enviou um convite para este horário.');             
+            }
+
+            if (!convite.horario) {
+            convite.horario = new Date;
+            }
+            const horarioOriginal = new Date(convite.horario);
+            const horarioZerado = moment(horarioOriginal)
+            .tz('America/Sao_Paulo')
+            .startOf('hour')
+            .toDate(); // retorna como objeto Date
+            const conviteData: Convite = {
             id: uuidv4(),
             status: 'PENDENTE',
             tomadorId: convite.tomadorId,
             prestadorId: userId,
             agendaId: convite.agendaId,
             mensagem: convite.mensagem,
-        }
+            horario: horarioZerado.toISOString(),
+            }
 
-        await this.conviteRepository.create(conviteData);
+            await this.conviteRepository.create(conviteData);
+            return new SucessDto(true, 'Envio de convite realizado com sucesso!');             
+        } catch (error) {
+            console.error('Error creating convite:', error);
+            return new SucessDto(false, 'Erro ao criar convite.');
+        }
     }
 
     async findAll(): Promise<Convite[]> {
@@ -81,7 +104,11 @@ export class ConviteService {
                     profissional = profissionais.find(p => p.id === convite.tomadorId);
                 }
 
+                
                 const agenda = agendas.find(p => p.id === convite.agendaId);
+                if(!agenda){
+                    convite.status = 'AGENDA CANCELADA'
+                }
                 return {
                     convite: convite,
                     agenda: agenda,
@@ -95,7 +122,6 @@ export class ConviteService {
                             celular: profissional.celular,
                             link: profissional.link,
                             instagram: profissional.instagram,
-                            facebook: profissional.facebook,
                             foto: profissional.foto,
                             cep: profissional.cep,
                             comentariosId: profissional.comentariosId,
@@ -119,6 +145,9 @@ export class ConviteService {
             }
 
             const agenda = agendas.find(p => p.id === convite.agendaId);
+            if(!agenda){
+                convite.status = 'AGENDA CANCELADA'
+            }
             return {
                 convite: convite,
                 agenda: agenda,
@@ -132,7 +161,6 @@ export class ConviteService {
                         celular: profissional.celular,
                         link: profissional.link,
                         instagram: profissional.instagram,
-                        facebook: profissional.facebook,
                         foto: profissional.foto,
                         cep: profissional.cep,
                         comentariosId: profissional.comentariosId,
@@ -154,6 +182,20 @@ export class ConviteService {
                         throw new Error('Você não tem permissão para alterar este convite.');
                     }
                     convite.status = dto.status;
+                    if (dto.status === 'ACEITO') {
+                        const agenda = await this.agendaRepository.findById(convite.agendaId || 'null');
+                        if (agenda) {
+                            agenda.status = 'AGENDADO';
+                            await this.agendaRepository.update(agenda.id, agenda);
+                        }
+                    }
+                    if(dto.status === 'RECUSADO'){
+                        const agenda = await this.agendaRepository.findById(convite.agendaId || 'null');
+                        if (agenda) {
+                            agenda.status = 'ABERTO';
+                            await this.agendaRepository.update(agenda.id, agenda);
+                        }
+                    }
                     return this.conviteRepository.update(convite.id, convite);
                 }
             } else {

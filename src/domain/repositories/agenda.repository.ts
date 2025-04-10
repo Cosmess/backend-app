@@ -16,7 +16,7 @@ export class AgendaRepository {
     async findAll(id: string): Promise<Agenda[]> {
         const db = this.firebaseService.getFirestore();
         const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday.setDate(yesterday.getDate() - 2);
 
         const snapshot = await db
             .collection(this.collection)
@@ -27,6 +27,17 @@ export class AgendaRepository {
         const agendas = snapshot.docs.map(doc => doc.data() as Agenda);
 
         return agendas.filter(agenda => agenda.horario && new Date(agenda.horario) >= yesterday);
+    }
+
+    async findById(id: string): Promise<Agenda | null> {
+        const db = this.firebaseService.getFirestore();
+        const doc = await db.collection(this.collection).doc(id).get();
+
+        if (!doc.exists) {
+            return null;
+        }
+
+        return doc.data() as Agenda;
     }
 
     async update(id: string, data: Partial<Agenda>): Promise<void> {

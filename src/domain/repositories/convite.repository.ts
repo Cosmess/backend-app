@@ -100,5 +100,20 @@ export class ConviteRepository {
       
         return null;
       }
+
+      async findByPrestadorAndAgendaId(prestadorId: string = '', agendaId: string = ''): Promise<Convite | null> {
+        const db = this.firebaseService.getFirestore();
+        const snapshot = await db
+            .collection(this.collection)
+            .where('prestadorId', '==', prestadorId)
+            .where('agendaId', '==', agendaId)
+            .get();
+            
+            if (!snapshot.empty) {
+                return snapshot.docs[0].data() as Convite;
+              }
+            
+              return null;
+        }
       
 }

@@ -15,7 +15,6 @@ export class Estabelecimento {
       public created: Date,
       public updated: Date,
       public descricao: string,
-      public facebook: string,
       public instagram: string,
       public link: string,
       public status: string,

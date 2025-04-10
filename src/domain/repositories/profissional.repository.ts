@@ -26,7 +26,7 @@ export class ProfissionalRepository {
     const db = this.firebaseService.getFirestore();
     const snapshot = await db
       .collection(this.collection)
-      .where('status', '==', 'ATIVO')
+      .where('paidStatus', '==', true)
       .get();
 
     return snapshot.docs.map(doc => doc.data() as Profissional);
@@ -38,7 +38,7 @@ export class ProfissionalRepository {
     const snapshot = await db
       .collection('profissionais')
       .where('id', 'in', ids)
-      .where('status', '==', 'ATIVO')
+      .where('paidStatus', '==', true)
       .get();
   
     return snapshot.docs.map(doc => doc.data() as Profissional);

@@ -44,21 +44,6 @@ export class ProfissionalService {
                 return new SucessDto(false, 'Email já cadastrado');
             }
 
-            const geolocalizacaoExists = await this.geolocalizacaoRepository.findByCep(profissional.cep);
-            if (!geolocalizacaoExists) {
-                const coordenadas = await this.geoService.obterLatLngPorCep(profissional.cep);
-                if (coordenadas) {
-                    const geolocalizacao: Geolocalizacao = {
-                        id: uuidv4(),
-                        lat: coordenadas.lat,
-                        lng: coordenadas.lng,
-                        cep: profissional.cep
-                    }
-
-                    await this.geolocalizacaoRepository.create(geolocalizacao);
-                }
-            }
-
             const croValidate = await this.croApiService.buscarPorNumeroRegistro(profissional.cro);
             if (!croValidate) {
                 profissional.status = 'PENDENTE';
@@ -124,7 +109,6 @@ export class ProfissionalService {
                     cro: profissional.cro,
                     link: profissional.link,
                     instagram: profissional.instagram,
-                    facebook: profissional.facebook,
                     foto: profissional.foto,
                     cep: profissional.cep,
                     comentariosId: profissional.comentariosId,

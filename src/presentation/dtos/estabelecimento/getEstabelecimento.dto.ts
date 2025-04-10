@@ -18,10 +18,6 @@ export class GetEstabelecimentoDto {
     @IsString()
     estado: string;
 
-    @ApiProperty({ required: false })
-    @IsOptional()
-    @IsString()
-    km: string;
 
     @ApiProperty({ required: false })
     @IsOptional()

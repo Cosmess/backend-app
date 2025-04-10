@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import './infrastructure/cron/pagamento-cron';
+import { ValidationPipe } from '@nestjs/common/pipes';
 
 dotenv.config();
 const port = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
+  app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(port);
 }

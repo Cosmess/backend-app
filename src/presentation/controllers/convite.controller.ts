@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Req, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Req, UseGuards, Query, BadRequestException } from '@nestjs/common';
 import { ConviteService } from '../../application/services/convite.service';
 import { CriarConviteDto } from '../dtos/convite/criarConvite.dto';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,7 +16,11 @@ export class ConviteController {
     @Post()
     async create(@Body() conviteDto: CriarConviteDto, @Req() req: any) {
         const userId = req.user.userId as any;
-        return this.conviteService.create(conviteDto, userId);
+        const result = await this.conviteService.create(conviteDto, userId);
+        if (!result.status) {
+            throw new BadRequestException(JSON.stringify(result));
+        }
+        return JSON.stringify(result);
     }
 
     @UseGuards(JwtAuthGuard)
