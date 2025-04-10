@@ -99,21 +99,10 @@ export class ProfissionalRepository {
 
   async findByFiltros(filtros: { cep?: string; cidade?: string; estado?: string; especialidade?: string[] }): Promise<Profissional[]> {
     const db = this.firebaseService.getFirestore();
-    let ref = db.collection('profissionais').where('status', '==', 'ATIVO') as FirebaseFirestore.Query;
+    let ref = db.collection('profissionais').where('paidStatus', '==', true) as FirebaseFirestore.Query;
 
     if (filtros.cep) {
       ref = ref.where('cep', '==', filtros.cep);
-    } else if (filtros.cidade) {
-      ref = ref.where('cidade', '==', filtros.cidade);
-    } else if (filtros.estado) {
-      ref = ref.where('estado', '==', filtros.estado);
-    }
-
-    if (Array.isArray(filtros.especialidade) && filtros.especialidade.length > 0) {
-      const especialidades = filtros.especialidade.map(e => e.trim().toUpperCase());
-      ref = ref.where('especialidades', 'array-contains-any', especialidades);
-    }else{
-      ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
     }
 
     const snapshot = await ref.get();

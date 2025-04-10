@@ -100,23 +100,12 @@ export class EstabelecimentoRepository {
 
   async findByFiltros(filtros: GetEstabelecimentoDto): Promise<Estabelecimento[]> {
     const db = this.firebaseService.getFirestore();
-    let ref = db.collection('estabelecimentos').where('status', '==', 'ATIVO') as FirebaseFirestore.Query;
+    let ref = db.collection('estabelecimentos').where('paidStatus', '==', true) as FirebaseFirestore.Query;
 
     if (filtros.cep) {
       ref = ref.where('cep', '==', filtros.cep);
-    } else if (filtros.cidade && filtros.estado) {
-      ref = ref.where('cidade', '==', filtros.cidade);
-      ref = ref.where('estado', '==', filtros.estado);
     }
-    if (Array.isArray(filtros.especialidade) && filtros.especialidade.length > 0) {
-      const especialidades = filtros.especialidade.map(e => e.trim().toUpperCase());
-      ref = ref.where('especialidades', 'array-contains-any', especialidades);
-    } else {
-      if (filtros.especialidade) {
-        ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
-      }
 
-    }
     const snapshot = await ref.get();
     const result: Estabelecimento[] = [];
 

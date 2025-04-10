@@ -120,60 +120,7 @@ export class EstabelecimentoService {
     const userData = await this.profissionalRepository.findById(userId);
     if (!userData?.cep) return [];
 
-    if (filtros.horarios) {
-      const agendas = await this.agendaService.findByHorario(filtros.horarios)
-      if (!agendas) return [];
 
-      const agendaIds = agendas.map(agenda => agenda.tomadorId);
-      const profissionais = await this.estabelecimentoRepository.findByIds(agendaIds.filter(id => id !== undefined));
-      return profissionais.map((estabelecimento) => {
-        const resultado: Partial<Estabelecimento> = {
-          id: estabelecimento.id,
-          nome: estabelecimento.nome,
-          descricao: estabelecimento.descricao,
-          cidade: estabelecimento.cidade,
-          bairro: estabelecimento.bairro,
-          estado: estabelecimento.estado,
-          cro: estabelecimento.cro,
-          link: estabelecimento.link,
-          instagram: estabelecimento.instagram,
-          facebook: estabelecimento.facebook,
-          foto: estabelecimento.foto,
-          cep: estabelecimento.cep,
-          comentariosId: estabelecimento.comentariosId,
-          especialidades: estabelecimento.especialidades,
-        };
-        if (estabelecimento.exibirNumero) {
-          resultado.celular = estabelecimento.celular;
-        }
-        return resultado;
-      });
-    }
-
-    if (filtros.cidade && filtros.estado) {
-      const filtrados = await this.estabelecimentoRepository.findByFiltros(filtros);
-      return filtrados.map((estabelecimento) => {
-        const resultado: Partial<Estabelecimento> = {
-          id: estabelecimento.id,
-          nome: estabelecimento.nome,
-          descricao: estabelecimento.descricao,
-          cidade: estabelecimento.cidade,
-          estado: estabelecimento.estado,
-          cro: estabelecimento.cro,
-          link: estabelecimento.link,
-          instagram: estabelecimento.instagram,
-          facebook: estabelecimento.facebook,
-          foto: estabelecimento.foto,
-          cep: estabelecimento.cep,
-          comentariosId: estabelecimento.comentariosId,
-          especialidades: estabelecimento.especialidades
-        };
-        if (estabelecimento.exibirNumero) {
-          resultado.celular = estabelecimento.celular;
-        }
-        return resultado;
-      });
-    }
 
     if (filtros.cep) {
       const filtrados = await this.estabelecimentoRepository.findByFiltros(filtros);
@@ -201,77 +148,7 @@ export class EstabelecimentoService {
       });
     }
 
-    if (filtros.especialidade) {
-      const filtrados = await this.estabelecimentoRepository.findByFiltros(filtros);
-      return filtrados.map((estabelecimento) => {
-        const resultado: Partial<Estabelecimento> = {
-          id: estabelecimento.id,
-          nome: estabelecimento.nome,
-          descricao: estabelecimento.descricao,
-          cidade: estabelecimento.cidade,
-          estado: estabelecimento.estado,
-          cro: estabelecimento.cro,
-          link: estabelecimento.link,
-          instagram: estabelecimento.instagram,
-          facebook: estabelecimento.facebook,
-          foto: estabelecimento.foto,
-          cep: estabelecimento.cep,
-          comentariosId: estabelecimento.comentariosId,
-          especialidades: estabelecimento.especialidades
-        };
-        if (estabelecimento.exibirNumero) {
-          resultado.celular = estabelecimento.celular;
-        }
-        return resultado;
-      });
-    }
-
-    const origem = await this.geolocalizacaoRepository.findByCep(userData.cep);
-    if (!origem) return [];
-
     const todosEstabelecimentos = await this.estabelecimentoRepository.findAll();
-    const estabelecimentosProximos: Partial<Estabelecimento>[] = [];
-
-    if (filtros.km) {
-      for (const estabelecimento of todosEstabelecimentos) {
-        if (estabelecimento.cep) {
-          const destino = await this.geolocalizacaoRepository.findByCep(estabelecimento.cep);
-
-          if (destino) {
-            const distancia = await this.geoService.calcularDistancia(
-              { lat: parseFloat(origem.lat), lng: parseFloat(origem.lng) },
-              { lat: parseFloat(destino.lat), lng: parseFloat(destino.lng) }
-            );
-
-            if (distancia <= Number(filtros.km)) {
-              const resultado: Partial<Estabelecimento> = {
-                id: estabelecimento.id,
-                nome: estabelecimento.nome,
-                descricao: estabelecimento.descricao,
-                cidade: estabelecimento.cidade,
-                estado: estabelecimento.estado,
-                cro: estabelecimento.cro,
-                link: estabelecimento.link,
-                instagram: estabelecimento.instagram,
-                facebook: estabelecimento.facebook,
-                foto: estabelecimento.foto,
-                cep: estabelecimento.cep,
-                comentariosId: estabelecimento.comentariosId,
-                especialidades: estabelecimento.especialidades
-              };
-
-              if (estabelecimento.exibirNumero) {
-                resultado.celular = estabelecimento.celular;
-              }
-
-              estabelecimentosProximos.push(resultado);
-            }
-          }
-        }
-      }
-
-      return estabelecimentosProximos;
-    }
 
     return todosEstabelecimentos.map((estabelecimentoData) => {
       const estabelecimento: Partial<Estabelecimento> = {
