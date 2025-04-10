@@ -58,7 +58,7 @@ export class ProfissionalService {
 
             if (file) {
                 const fileName = await this.s3service.uploadFile(file, 'estabelecimentos');
-                if(!fileName.success){
+                if (!fileName.success) {
                     return new SucessDto(false, fileName.message);
                 }
                 profissional.foto = fileName.message;
@@ -122,9 +122,29 @@ export class ProfissionalService {
             });
         }
 
-        const origem = await this.geolocalizacaoRepository.findByCep(userData.cep);
-        if (!origem) return [];
-
+        if (filtros.especialidade) {
+            const filtrados = await this.profissionalRepository.findByFiltros(filtros);
+            return filtrados.map((profissional) => {
+                const resultado: Partial<Profissional> = {
+                    nome: profissional.nome,
+                    descricao: profissional.descricao,
+                    cidade: profissional.cidade,
+                    estado: profissional.estado,
+                    cro: profissional.cro,
+                    link: profissional.link,
+                    instagram: profissional.instagram,
+                    foto: profissional.foto,
+                    cep: profissional.cep,
+                    comentariosId: profissional.comentariosId,
+                    especialidades: profissional.especialidades
+                };
+                if (profissional.exibirNumero) {
+                    resultado.celular = profissional.celular;
+                }
+                return resultado;
+            });
+        }
+        
         const todosProfissionais = await this.profissionalRepository.findAll();
 
         return todosProfissionais;
@@ -170,7 +190,7 @@ export class ProfissionalService {
             throw new BadRequestException('Você não tem permissão para atualizar este profissional');
         }
         if (file) {
-            const fileName = await this.s3service.uploadFile(file, 'estabelecimentos');            
+            const fileName = await this.s3service.uploadFile(file, 'estabelecimentos');
             data.foto = fileName.message;
         }
         if (typeof data.exibirNumero === 'string') {

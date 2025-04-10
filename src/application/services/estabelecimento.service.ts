@@ -132,6 +132,30 @@ export class EstabelecimentoService {
       });
     }
 
+    if (filtros.especialidade) {
+      const filtrados = await this.estabelecimentoRepository.findByFiltros(filtros);
+      return filtrados.map((estabelecimento) => {
+        const resultado: Partial<Estabelecimento> = {
+          id: estabelecimento.id,
+          nome: estabelecimento.nome,
+          descricao: estabelecimento.descricao,
+          cidade: estabelecimento.cidade,
+          estado: estabelecimento.estado,
+          cro: estabelecimento.cro,
+          link: estabelecimento.link,
+          instagram: estabelecimento.instagram,
+          foto: estabelecimento.foto,
+          cep: estabelecimento.cep,
+          comentariosId: estabelecimento.comentariosId,
+          especialidades: estabelecimento.especialidades
+        };
+        if (estabelecimento.exibirNumero) {
+          resultado.celular = estabelecimento.celular;
+        }
+        return resultado;
+      });
+    }
+
     const todosEstabelecimentos = await this.estabelecimentoRepository.findAll();
 
     return todosEstabelecimentos.map((estabelecimentoData) => {

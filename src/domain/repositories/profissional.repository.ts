@@ -105,6 +105,10 @@ export class ProfissionalRepository {
       ref = ref.where('cep', '==', filtros.cep);
     }
 
+    if(filtros.especialidade){
+      ref = ref.where('especialidades', 'array-contains', filtros.especialidade);
+    }
+
     const snapshot = await ref.get();
     const result: Profissional[] = [];
 
