@@ -68,7 +68,7 @@ export class ProfissionalController {
   @Put(':id')
   @UseInterceptors(FileInterceptor('foto'))
   @ApiConsumes('multipart/form-data')
-  async update(@UploadedFile() file: File,@Param('id') id: string, @Body() data: ProfissionalDto, @Req() req: any) {
+  async update(@UploadedFile() file: File,@Param('id') id: string, @Body() data: Partial<ProfissionalDto>, @Req() req: any) {
     const userId = req.user.userId as any;
     return this.profissionalService.update(id, data, userId,file);
   }
