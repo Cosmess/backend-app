@@ -121,15 +121,14 @@ export class EmailService {
     }
 
     
-    async enviarEmail(email: string, title: string ,body: string): Promise<string> {
+    async enviarEmailCobranca(email: string, title: string ,body: string): Promise<string> {
         try {
-            const codigo = randomInt(100000, 999999).toString();
 
             const params = {
                 Source: process.env.AWS_EMAIL_FROM,
                 Destination: { ToAddresses: [email] },
                 Message: {
-                    Subject: { Data: 'Código de Verificação' },
+                    Subject: { Data: 'Sua Assinatura Dentsfreela' },
                     Body: {
                         Html: {
                             Data: `
@@ -138,7 +137,7 @@ export class EmailService {
                                 <head>
                                     <meta charset="UTF-8">
                                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                    <title>Código de Verificação</title>
+                                    <title>Sua Assinatura Dentsfreela</title>
                                     <style>
                                         body {
                                             font-family: Arial, sans-serif;
@@ -213,7 +212,7 @@ export class EmailService {
 
             await this.ses.send(new SendEmailCommand(params));
 
-            return codigo;
+            return 'enviado';
         } catch (error) {
             console.error(error.message);
             return "";

@@ -55,10 +55,10 @@ export class AuthService {
       if (user.paidStatus === false) {
         const pagamento = await this.pagamentoService.findByEmail(emailOrPhone);
         if (!pagamento) {
-          throw new UnauthorizedException('Pagamento pendente');
+          throw new UnauthorizedException('Usuario pendente ! Verifique sua caixa de e-mail');
         }
         if (pagamento.status !== 'approved') {
-          throw new UnauthorizedException('Pagamento pendente');
+          throw new UnauthorizedException('Usuario pendente ! Verifique sua caixa de e-mail');
         }
         if (pagamento.status === 'approved') {
           await this.pagamentoService.setPaymentStatus(emailOrPhone);

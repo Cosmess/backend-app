@@ -11,25 +11,27 @@ const estabelecimentoRepository = new EstabelecimentoRepository(firebaseService)
 const emailService = new EmailService(profissionalRepository, estabelecimentoRepository);
 
 const checkPaymentDueDates = async () => {
-const profissionais = await profissionalRepository.findAll();
-const estabelecimentos = await estabelecimentoRepository.findAll();
+  const profissionais = await profissionalRepository.findAll();
+  const estabelecimentos = await estabelecimentoRepository.findAll();
 
-const entities = [
+  const entities = [
     ...profissionais.map(profissional => ({
-        email: profissional.email,
-        dateLastPayment: profissional.dateLastPayment,
+      email: profissional.email,
+      dateLastPayment: profissional.dateLastPayment,
+      id: profissional.id,
+      type: 'profissional'
     })),
     ...estabelecimentos.map(estabelecimento => ({
-        email: estabelecimento.email,
-        dateLastPayment: estabelecimento.dateLastPayment,
+      email: estabelecimento.email,
+      dateLastPayment: estabelecimento.dateLastPayment,
+      id: estabelecimento.id,
+      type: 'estabelecimento'
     })),
-];
+  ];
 
-
-  const today = new Date();
 
   entities.forEach(entity => {
-    const { email, dateLastPayment } = entity;
+    const { email, dateLastPayment, id, type } = entity;
     let paymentDueDate: moment.Moment | null = null;
 
     if (
@@ -43,36 +45,43 @@ const entities = [
       // Tipo Date
       paymentDueDate = moment(dateLastPayment).add(31, 'days');
     }
-  
+
     if (!paymentDueDate) return;
-  
+
     const today = moment();
     const daysUntilDue = paymentDueDate.diff(today, 'days');
 
     if (daysUntilDue === 5) {
-      emailService.enviarEmail(
+      emailService.enviarEmailCobranca(
         email,
         'Aviso: Vencimento Próximo',
         'Sua assinatura vencerá em 5 dias. Por favor, renove para evitar interrupções.',
       );
     } else if (daysUntilDue === 1) {
-      emailService.enviarEmail(
+      emailService.enviarEmailCobranca(
         email,
         'Aviso: Último Dia para Renovação',
         'Sua assinatura vencerá amanhã. Por favor, renove para evitar interrupções.',
       );
     } else if (daysUntilDue <= 0) {
-      emailService.enviarEmail(
+      emailService.enviarEmailCobranca(
         email,
         'Aviso: Assinatura Vencida',
         'Sua assinatura venceu. Por favor, renove para continuar utilizando nossos serviços.',
       );
+      if (type === 'profissional') {
+        profissionalRepository.update(id, { paidStatus: false });
+      }
+      if (type === 'estabelecimento') {
+        estabelecimentoRepository.update(id, { paidStatus: false });
+      }
     }
+
   });
 };
 
-// Agendar a cron para rodar diariamente às 00:00
-cron.schedule('0 0 * * *', async () => {
+// Agendar a cron para rodar diariamente às 00:00 
+cron.schedule('3 0 * * *', async () => {
   console.log('🔄 Executando verificação de vencimentos...');
   await checkPaymentDueDates();
   console.log('✅ Verificação concluída.');
