@@ -11,15 +11,6 @@ export class EstabelecimentoRepository {
 
   async create(estabelecimento: Estabelecimento): Promise<void> {
     const db = this.firebaseService.getFirestore();
-
-    if (typeof estabelecimento.especialidades === 'string') {
-      estabelecimento.especialidades = [estabelecimento.especialidades];
-    } else if (!Array.isArray(estabelecimento.especialidades)) {
-      estabelecimento.especialidades = [];
-    }
-
-    estabelecimento.especialidades = estabelecimento.especialidades.map(e => e.trim().toUpperCase());
-
     await db.collection(this.collection).doc(estabelecimento.id).set({ ...estabelecimento });
   }
 
@@ -62,16 +53,6 @@ export class EstabelecimentoRepository {
 
   async update(id: string, data: Partial<Estabelecimento>): Promise<void> {
     const db = this.firebaseService.getFirestore();
-
-    if (typeof data.especialidades === 'string') {
-      data.especialidades = [data.especialidades];
-    } else if (!Array.isArray(data.especialidades)) {
-      data.especialidades = [];
-    }
-
-
-    data.especialidades = data.especialidades.map(e => e.trim().toUpperCase());
-
     if (typeof data.exibirNumero === 'string') {
       if (data.exibirNumero === 'true') {
         data.exibirNumero = true;

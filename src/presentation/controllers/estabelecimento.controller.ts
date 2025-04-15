@@ -17,11 +17,6 @@ export class EstabelecimentoController {
   @UseInterceptors(FileInterceptor('foto'))
   @ApiConsumes('multipart/form-data')
   async create(@UploadedFile() file: File, @Body() estabelecimentoDto: EstabelecimentoDto) {
-    const especialidades = Array.isArray(estabelecimentoDto.especialidades)
-      ? estabelecimentoDto.especialidades
-      : typeof estabelecimentoDto.especialidades === 'string'
-        ? (estabelecimentoDto.especialidades as string).split(',').map(e => e.trim())
-        : [];
     const estabelecimento: Estabelecimento = {
       id: uuidv4(),
       ...estabelecimentoDto,
@@ -30,7 +25,6 @@ export class EstabelecimentoController {
       status: '',
       paidStatus: true,
       dateLastPayment: new Date(),
-      especialidades: especialidades,
       comentariosId: '',
       planoId: '',
       exibirNumero: estabelecimentoDto.exibirNumero,
