@@ -66,6 +66,7 @@ export class ProfissionalService {
 
             const codigo = await this.emailService.enviarCodigoVerificacao(profissional.email);
             profissional.codigo = codigo;
+            profissional.emailVerificado = false;
             profissional.dateLastPayment = moment().tz('America/Sao_Paulo').toDate();
             await this.profissionalRepository.create(profissional);
 

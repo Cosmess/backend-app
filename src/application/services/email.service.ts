@@ -267,6 +267,11 @@ export class EmailService {
         }
 
         if (user.codigo === codigo) {
+            if(isProfissional){
+                await this.profissionalRepository.update(user.id, { emailVerificado: true })
+            }else{
+                await this.estabelecimentoRepository.update(user.id, { emailVerificado: true })
+            }
             return true;
         } else {
             return false;

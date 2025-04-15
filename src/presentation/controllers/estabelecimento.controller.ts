@@ -34,7 +34,7 @@ export class EstabelecimentoController {
       comentariosId: '',
       planoId: '',
       exibirNumero: estabelecimentoDto.exibirNumero,
-      telefoneVerificado: false,
+      emailVerificado: false,
     };
 
     const result = await this.estabelecimentoService.create(estabelecimento, file);

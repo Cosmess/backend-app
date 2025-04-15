@@ -71,6 +71,7 @@ export class EstabelecimentoService {
 
       const codigo = await this.emailService.enviarCodigoVerificacao(estabelecimento.email)
       estabelecimento.codigo = codigo;
+      estabelecimento.emailVerificado = false;
       estabelecimento.dateLastPayment = moment().tz('America/Sao_Paulo').toDate();
       await this.estabelecimentoRepository.create(estabelecimento);
 

@@ -22,7 +22,7 @@ export class Estabelecimento {
       public especialidades: string[],
       public comentariosId: string,
       public planoId: string,
-      public telefoneVerificado: boolean,
+      public emailVerificado: boolean,
       public senha: string,
       public email: string,
       public foto?: string,
