@@ -14,7 +14,7 @@ import { Geolocalizacao } from 'src/domain/entities/geolocalizacao.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { GetEstabelecimentoDto } from 'src/presentation/dtos/estabelecimento/getEstabelecimento.dto';
 import { ProfissionalRepository } from 'src/domain/repositories/profissional.repository';
-
+import * as moment from 'moment-timezone';
 @Injectable()
 export class EstabelecimentoService {
   constructor(private readonly estabelecimentoRepository: EstabelecimentoRepository,
@@ -71,7 +71,7 @@ export class EstabelecimentoService {
 
       const codigo = await this.emailService.enviarCodigoVerificacao(estabelecimento.email)
       estabelecimento.codigo = codigo;
-
+      estabelecimento.dateLastPayment = moment().tz('America/Sao_Paulo').toDate();
       await this.estabelecimentoRepository.create(estabelecimento);
 
 

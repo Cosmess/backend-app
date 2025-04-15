@@ -14,7 +14,7 @@ import { File } from 'multer';
 import { AgendaService } from './agenda.service';
 import { S3Service } from 'src/infrastructure/s3/s3.service';
 import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
-
+import * as moment from 'moment-timezone';
 @Injectable()
 export class ProfissionalService {
     constructor(private readonly profissionalRepository: ProfissionalRepository,
@@ -66,6 +66,7 @@ export class ProfissionalService {
 
             const codigo = await this.emailService.enviarCodigoVerificacao(profissional.email);
             profissional.codigo = codigo;
+            profissional.dateLastPayment = moment().tz('America/Sao_Paulo').toDate();
             await this.profissionalRepository.create(profissional);
 
 

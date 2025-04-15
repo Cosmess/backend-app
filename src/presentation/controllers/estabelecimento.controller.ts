@@ -28,7 +28,7 @@ export class EstabelecimentoController {
       instagram: '',
       link: '',
       status: '',
-      paidStatus: false,
+      paidStatus: true,
       dateLastPayment: new Date(),
       especialidades: especialidades,
       comentariosId: '',

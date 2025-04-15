@@ -81,7 +81,7 @@ const checkPaymentDueDates = async () => {
 };
 
 // Agendar a cron para rodar diariamente às 00:00 
-cron.schedule('3 0 * * *', async () => {
+cron.schedule('03 0 * * *', async () => {
   console.log('🔄 Executando verificação de vencimentos...');
   await checkPaymentDueDates();
   console.log('✅ Verificação concluída.');

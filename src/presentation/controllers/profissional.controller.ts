@@ -26,7 +26,7 @@ export class ProfissionalController {
       id: uuidv4(),
       ...profissionalDto,
       status: '',
-      paidStatus: false,
+      paidStatus: true,
       dateLastPayment: new Date(),
       especialidades: especialidades,
       comentariosId: '',
