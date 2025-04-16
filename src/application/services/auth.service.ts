@@ -3,12 +3,12 @@ import { JwtService } from '@nestjs/jwt';
 import { ProfissionalService } from './profissional.service';
 import { EstabelecimentoService } from './estabelecimento.service';
 import * as bcrypt from 'bcrypt';
-import { AuthDto } from '../../presentation/dtos/auth/auth.dto';
-import { ChangePassword } from 'src/presentation/dtos/auth/changePassword.dto';
+import { AuthDto } from '../../crosscuting/dtos/auth/auth.dto';
+import { ChangePassword } from 'src/crosscuting/dtos/auth/changePassword.dto';
 import { ProfissionalRepository } from 'src/domain/repositories/profissional.repository';
 import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
-import { ChangeStatus } from 'src/presentation/dtos/auth/changeStatus.dto';
-import { ResetPassword } from 'src/presentation/dtos/auth/resetPassword.dto';
+import { ChangeStatus } from 'src/crosscuting/dtos/auth/changeStatus.dto';
+import { ResetPassword } from 'src/crosscuting/dtos/auth/resetPassword.dto';
 import { EmailService } from './email.service';
 import { PagamentoService } from './pagamento.service';
 

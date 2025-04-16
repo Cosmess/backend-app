@@ -3,13 +3,13 @@ import { ProfissionalRepository } from '../../domain/repositories/profissional.r
 import { Profissional } from '../../domain/entities/profissional.entity';
 import * as bcrypt from 'bcrypt';
 import { CroApiService } from 'src/infrastructure/external/cro-api.service';
-import { SucessDto } from 'src/presentation/dtos/success.dto';
+import { SucessDto } from 'src/crosscuting/dtos/success.dto';
 import { EmailService } from './email.service';
 import { GeoLocateService } from './geolocate.service';
 import { Geolocalizacao } from 'src/domain/entities/geolocalizacao.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { GeolocalizacaoRepository } from 'src/domain/repositories/geolocalizacao.repository';
-import { GetProfissionallDto } from 'src/presentation/dtos/profissional/getProfissional.dto';
+import { GetProfissionallDto } from 'src/crosscuting/dtos/profissional/getProfissional.dto';
 import { File } from 'multer';
 import { AgendaService } from './agenda.service';
 import { S3Service } from 'src/infrastructure/s3/s3.service';

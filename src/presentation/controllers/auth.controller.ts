@@ -1,12 +1,12 @@
 import { Controller, Post, Body, UnauthorizedException, BadRequestException, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from '../../application/services/auth.service';
-import { AuthDto } from '../dtos/auth/auth.dto';
-import { ChangePassword } from '../dtos/auth/changePassword.dto';
+import { AuthDto } from '../../crosscuting/dtos/auth/auth.dto';
+import { ChangePassword } from '../../crosscuting/dtos/auth/changePassword.dto';
 import { ok } from 'assert';
 import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { ChangeStatus } from '../dtos/auth/changeStatus.dto';
-import { ResetPassword } from '../dtos/auth/resetPassword.dto';
+import { ChangeStatus } from '../../crosscuting/dtos/auth/changeStatus.dto';
+import { ResetPassword } from '../../crosscuting/dtos/auth/resetPassword.dto';
 
 @Controller('auth')
 export class AuthController {

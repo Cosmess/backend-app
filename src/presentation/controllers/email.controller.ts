@@ -1,8 +1,8 @@
 
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { EmailService } from '../../application/services/email.service';
-import { EmailDto } from '../dtos/email/email.dto';
-import { VerificacaoEmailDto } from '../dtos/email/verificacaoEmail.dto';
+import { EmailDto } from '../../crosscuting/dtos/email/email.dto';
+import { VerificacaoEmailDto } from '../../crosscuting/dtos/email/verificacaoEmail.dto';
 
 @Controller('email')
 export class EmailController {

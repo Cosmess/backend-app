@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ConviteRepository } from '../../domain/repositories/convite.repository';
 import { Convite } from '../../domain/entities/convite.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { CriarConviteDto } from 'src/presentation/dtos/convite/criarConvite.dto';
+import { CriarConviteDto } from 'src/crosscuting/dtos/convite/criarConvite.dto';
 import { ProfissionalRepository } from 'src/domain/repositories/profissional.repository';
-import { AlterarStatusConviteDto } from 'src/presentation/dtos/convite/alterarStatusConvite.dto';
+import { AlterarStatusConviteDto } from 'src/crosscuting/dtos/convite/alterarStatusConvite.dto';
 import { AgendaRepository } from 'src/domain/repositories/agenda.repository';
-import { GetConviteDto } from 'src/presentation/dtos/convite/getConvite.dto';
+import { GetConviteDto } from 'src/crosscuting/dtos/convite/getConvite.dto';
 import { Estabelecimento } from 'src/domain/entities/estabelecimento.entity';
 import { EstabelecimentoRepository } from 'src/domain/repositories/estabelecimento.repository';
 import * as moment from 'moment-timezone';
-import { SucessDto } from 'src/presentation/dtos/success.dto';
+import { SucessDto } from 'src/crosscuting/dtos/success.dto';
 
 @Injectable()
 export class ConviteService {

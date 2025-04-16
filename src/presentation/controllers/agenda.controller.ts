@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, Req, UseGuards } from '@nestjs/common';
 import { AgendaService } from '../../application/services/agenda.service';
-import { CriarAgendaDto } from '../dtos/agenda/criarAgenda.dto';
+import { CriarAgendaDto } from '../../crosscuting/dtos/agenda/criarAgenda.dto';
 import { Agenda } from '../../domain/entities/agenda.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
-import { ExcluirAgendaDto } from '../dtos/agenda/excluirAgenda.dto';
+import { ExcluirAgendaDto } from '../../crosscuting/dtos/agenda/excluirAgenda.dto';
 
 @Controller('agendas')
 export class AgendaController {

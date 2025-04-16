@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AgendaRepository } from '../../domain/repositories/agenda.repository';
 import { Agenda } from '../../domain/entities/agenda.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { CriarAgendaDto } from 'src/presentation/dtos/agenda/criarAgenda.dto';
+import { CriarAgendaDto } from 'src/crosscuting/dtos/agenda/criarAgenda.dto';
 import * as moment from 'moment-timezone';
 
 @Injectable()

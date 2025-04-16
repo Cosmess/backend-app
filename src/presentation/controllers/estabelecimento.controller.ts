@@ -1,13 +1,13 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, UseInterceptors, UploadedFile, UseGuards, Req, Query, BadRequestException } from '@nestjs/common';
 import { EstabelecimentoService } from '../../application/services/estabelecimento.service';
-import { EstabelecimentoDto } from '../dtos/estabelecimento/estabelecimento.dto';
+import { EstabelecimentoDto } from '../../crosscuting/dtos/estabelecimento/estabelecimento.dto';
 import { Estabelecimento } from '../../domain/entities/estabelecimento.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
 import { query } from 'express';
-import { GetEstabelecimentoDto } from '../dtos/estabelecimento/getEstabelecimento.dto';
+import { GetEstabelecimentoDto } from '../../crosscuting/dtos/estabelecimento/getEstabelecimento.dto';
 
 @Controller('estabelecimentos')
 export class EstabelecimentoController {

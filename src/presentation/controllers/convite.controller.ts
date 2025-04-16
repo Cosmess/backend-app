@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, Req, UseGuards, Query, BadRequestException } from '@nestjs/common';
 import { ConviteService } from '../../application/services/convite.service';
-import { CriarConviteDto } from '../dtos/convite/criarConvite.dto';
+import { CriarConviteDto } from '../../crosscuting/dtos/convite/criarConvite.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
-import { AlterarStatusConviteDto } from '../dtos/convite/alterarStatusConvite.dto';
-import { GetConviteDto } from '../dtos/convite/getConvite.dto';
+import { AlterarStatusConviteDto } from '../../crosscuting/dtos/convite/alterarStatusConvite.dto';
+import { GetConviteDto } from '../../crosscuting/dtos/convite/getConvite.dto';
 
 @Controller('convites')
 export class ConviteController {

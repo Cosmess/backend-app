@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 import { Estabelecimento } from '../entities/estabelecimento.entity';
-import { GetEstabelecimentoDto } from 'src/presentation/dtos/estabelecimento/getEstabelecimento.dto';
+import { GetEstabelecimentoDto } from 'src/crosscuting/dtos/estabelecimento/getEstabelecimento.dto';
 
 @Injectable()
 export class EstabelecimentoRepository {

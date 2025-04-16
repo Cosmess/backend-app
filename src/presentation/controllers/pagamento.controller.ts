@@ -1,7 +1,7 @@
 // src/modules/pagamento/pagamento.controller.ts
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { MercadoPagoService } from '../../application/services/mercado-pago.service';
-import { PagamentoDto } from '../dtos/pagamento/pagamento.dto';
+import { PagamentoDto } from '../../crosscuting/dtos/pagamento/pagamento.dto';
 
 @Controller('pagamento')
 export class PagamentoController {

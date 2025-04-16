@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, BadRequestException, UseGuards, Req, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ProfissionalService } from '../../application/services/profissional.service';
-import { ProfissionalDto } from '../dtos/profissional/profissional.dto';
+import { ProfissionalDto } from '../../crosscuting/dtos/profissional/profissional.dto';
 import { Profissional } from '../../domain/entities/profissional.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtAuthGuard } from 'src/infrastructure/jwt/jwt-auth.guard';
 import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
-import { GetProfissionallDto } from '../dtos/profissional/getProfissional.dto';
+import { GetProfissionallDto } from '../../crosscuting/dtos/profissional/getProfissional.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { File } from 'multer';
 

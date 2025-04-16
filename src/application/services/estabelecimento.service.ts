@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { EstabelecimentoRepository } from '../../domain/repositories/estabelecimento.repository';
 import { Estabelecimento } from '../../domain/entities/estabelecimento.entity';
 import * as bcrypt from 'bcrypt';
-import { SucessDto } from 'src/presentation/dtos/success.dto';
+import { SucessDto } from 'src/crosscuting/dtos/success.dto';
 import { EmailService } from './email.service';
 import { validarCNPJ } from 'src/crosscuting/utils';
 import { CroApiService } from 'src/infrastructure/external/cro-api.service';
@@ -12,7 +12,7 @@ import { AgendaService } from './agenda.service';
 import { S3Service } from 'src/infrastructure/s3/s3.service';
 import { Geolocalizacao } from 'src/domain/entities/geolocalizacao.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { GetEstabelecimentoDto } from 'src/presentation/dtos/estabelecimento/getEstabelecimento.dto';
+import { GetEstabelecimentoDto } from 'src/crosscuting/dtos/estabelecimento/getEstabelecimento.dto';
 import { ProfissionalRepository } from 'src/domain/repositories/profissional.repository';
 import * as moment from 'moment-timezone';
 @Injectable()
